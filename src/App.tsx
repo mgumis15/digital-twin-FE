@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import { Map2D } from './pages/Maps/map2D/map2D.page';
+import { Store } from './pages/store/store.page';
+import { Logs } from './pages/logs/logs.page';
+import { Home } from './pages/home/home.page';
+import { Navbar } from './components/navbar/Navbar.component';
+import { PageNotFound } from './pages/error/pageNotFound.page';
+import { Routes,Route } from 'react-router-dom';
 function App() {
   return (
+    <>
+    <Navbar/>
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Routes>
+          <Route path='/' element={<Home/>}/>
+          <Route path='/map' element={<Map2D/>}/>
+          <Route path='/store' element={<Store/>}/>
+          <Route path='/logs' element={<Logs/>}/>
+          <Route path='*' element={<PageNotFound/>}/>
+        </Routes>
     </div>
+    </>
+    
   );
 }
 
