@@ -1,8 +1,8 @@
 
-export const Logs =():JSX.Element=>{
-    return(
+export const Logs = (): JSX.Element => {
+    return (
         <>
-         <h1 className="text-center">LOGS</h1>
+            <h1 className="text-center">LOGS</h1>
         </>
     )
 }

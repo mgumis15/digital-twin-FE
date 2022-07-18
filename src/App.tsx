@@ -4,22 +4,22 @@ import { Logs } from './pages/logs/logs.page';
 import { Home } from './pages/home/home.page';
 import { Navbar } from './components/navbar/Navbar.component';
 import { PageNotFound } from './pages/error/pageNotFound.page';
-import { Routes,Route } from 'react-router-dom';
-function App() {
+import { Routes, Route } from 'react-router-dom';
+function App () {
   return (
     <>
-    <Navbar/>
-    <div className="App">
+      <Navbar />
+      <div className="App">
         <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/map' element={<Map2D/>}/>
-          <Route path='/store' element={<Store/>}/>
-          <Route path='/logs' element={<Logs/>}/>
-          <Route path='*' element={<PageNotFound/>}/>
+          <Route path='/' element={ <Home /> } />
+          <Route path='/map' element={ <Map2D /> } />
+          <Route path='/store' element={ <Store /> } />
+          <Route path='/logs' element={ <Logs /> } />
+          <Route path='*' element={ <PageNotFound /> } />
         </Routes>
-    </div>
+      </div>
     </>
-    
+
   );
 }
 
