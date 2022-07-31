@@ -1,6 +1,7 @@
 import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
 import robot from "../../../assets/images/robot.png"
 import packageImg from "../../../assets/images/package.png"
+import { Async, useAsync } from "react-async";
 
 interface Point {
     x: number,
@@ -18,6 +19,11 @@ interface Shelf {
     downRight: Point
 }
 
+interface Size {
+    w: number,
+    h: number
+}
+
 const robotSize = 40
 const robotImage = new Image()
 robotImage.src = robot
@@ -25,7 +31,11 @@ const packageImage = new Image()
 packageImage.src = packageImg
 
 export const Map2D = (): JSX.Element => {
+    const [isFetched, setIsFetched] = useState<Boolean>(false);
+    const [size, setSize] = useState<Size>({ w: 0, h: 0 });
     const [choosen, setChoosen] = useState<Package | null>(null);
+    const [shelfs, setShelfs] = useState<Shelf[]>([]);
+    const [packages, setPackages] = useState<Package[]>([]);
 
     function intersection (packages: Package[], point: Point) {
         for(let pack of packages) {
@@ -124,11 +134,10 @@ export const Map2D = (): JSX.Element => {
                 y: e.clientY - canvas.offsetTop
             }
             intersection(packages, mousePos)
+            console.log(mousePos)
         }
     }
 
-    const h = 500
-    const w = 1000
     let path: Point[] = []
     path.push({ x: 50, y: 100 })
     path.push({ x: 50, y: 200 })
@@ -136,38 +145,38 @@ export const Map2D = (): JSX.Element => {
     path.push({ x: 250, y: 300 })
     path.push({ x: 500, y: 300 })
     path.push({ x: 500, y: 400 })
-    let packages: Package[] = []
-    packages.push({
-        position: { x: 125, y: 80 }
-    })
-    packages.push({
-        position: { x: 425, y: 380 }
-    })
-    let shelfs: Shelf[] = []
-    shelfs.push({
-        upLeft: { x: 100, y: 50 },
-        upRight: { x: 150, y: 50 },
-        downLeft: { x: 100, y: 150 },
-        downRight: { x: 150, y: 150 },
-    })
-    shelfs.push({
-        upLeft: { x: 100, y: 250 },
-        upRight: { x: 150, y: 250 },
-        downLeft: { x: 100, y: 450 },
-        downRight: { x: 150, y: 450 },
-    })
-    shelfs.push({
-        upLeft: { x: 400, y: 50 },
-        upRight: { x: 450, y: 50 },
-        downLeft: { x: 400, y: 250 },
-        downRight: { x: 450, y: 250 },
-    })
-    shelfs.push({
-        upLeft: { x: 400, y: 350 },
-        upRight: { x: 450, y: 350 },
-        downLeft: { x: 400, y: 450 },
-        downRight: { x: 450, y: 450 },
-    })
+    // let packages: Package[] = []
+    // packages.push({
+    //     position: { x: 125, y: 80 }
+    // })
+    // packages.push({
+    //     position: { x: 425, y: 380 }
+    // })
+    // let shelfs: Shelf[] = []
+    // shelfs.push({
+    //     upLeft: { x: 100, y: 50 },
+    //     upRight: { x: 150, y: 50 },
+    //     downLeft: { x: 100, y: 150 },
+    //     downRight: { x: 150, y: 150 },
+    // })
+    // shelfs.push({
+    //     upLeft: { x: 100, y: 250 },
+    //     upRight: { x: 150, y: 250 },
+    //     downLeft: { x: 100, y: 450 },
+    //     downRight: { x: 150, y: 450 },
+    // })
+    // shelfs.push({
+    //     upLeft: { x: 400, y: 50 },
+    //     upRight: { x: 450, y: 50 },
+    //     downLeft: { x: 400, y: 250 },
+    //     downRight: { x: 450, y: 250 },
+    // })
+    // shelfs.push({
+    //     upLeft: { x: 400, y: 350 },
+    //     upRight: { x: 450, y: 350 },
+    //     downLeft: { x: 400, y: 450 },
+    //     downRight: { x: 450, y: 450 },
+    // })
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     useEffect(() => {
@@ -179,21 +188,64 @@ export const Map2D = (): JSX.Element => {
         }
     })
 
+
+    const loadUsers = () => fetch("http://localhost:4000/store")
+        .then(res => res.json())
+        .then(
+            (result) => {
+                setIsFetched(true)
+                setSize(result.size)
+                setPackages(result.packages)
+                setShelfs(result.shelfs)
+                return result
+            },
+            (error) => {
+                console.log(error)
+            }
+        )
+
     return (
         <div className="flex justify-around flex-wrap mt-10 px-10">
-            <canvas className="border-2 border-solid border-black" width={ w } height={ h } ref={ canvasRef } onMouseDown={ canvasClick }></canvas>
-            <div className="flex-1 justify-center items-center">
-                <div className="">
-                    { choosen === null ?
-                        <div>NO SELECTED PRODUCT</div>
-                        :
-                        <div>
-                            <div>x: { choosen.position.x }</div>
-                            <div>y: { choosen.position.y }</div>
+            { isFetched ?
+                <div>
+                    <canvas className="border-2 border-solid border-black" width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick }></canvas>
+                    <div className="flex-1 justify-center items-center">
+                        <div className="">
+                            { choosen === null ?
+                                <div>NO SELECTED PRODUCT</div>
+                                :
+                                <div>
+                                    <div>x: { choosen.position.x }</div>
+                                    <div>y: { choosen.position.y }</div>
+                                </div>
+                            }
                         </div>
-                    }
-                </div>
-            </div>
+                    </div>
+                </div> : <Async promiseFn={ loadUsers }>
+                    { ({ data, error, isLoading }) => {
+                        if(isLoading) return "Loading..."
+                        if(error) return `Something went wrong: ${error.message}`
+                        if(data)
+                            return (
+                                <div>
+                                    <canvas className="border-2 border-solid border-black" width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick }></canvas>
+                                    <div className="flex-1 justify-center items-center">
+                                        <div className="">
+                                            { choosen === null ?
+                                                <div>NO SELECTED PRODUCT</div>
+                                                :
+                                                <div>
+                                                    <div>x: { choosen.position.x }</div>
+                                                    <div>y: { choosen.position.y }</div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        return null
+                    } }
+                </Async> }
         </div>
     )
 }
