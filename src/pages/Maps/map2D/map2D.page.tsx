@@ -1,7 +1,7 @@
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import robot from "../../../assets/images/robot.png"
 import packageImg from "../../../assets/images/package.png"
-import { Async, useAsync } from "react-async";
+import { PacmanLoader } from "react-spinners";
 
 interface Point {
     x: number,
@@ -32,20 +32,19 @@ packageImage.src = packageImg
 
 export const Map2D = (): JSX.Element => {
     const [isFetched, setIsFetched] = useState<Boolean>(false);
+    const [isError, setIsError] = useState<Boolean>(false);
     const [size, setSize] = useState<Size>({ w: 0, h: 0 });
     const [choosen, setChoosen] = useState<Package | null>(null);
+    const [overPackage, setOverPackage] = useState<Boolean>(false);
     const [shelfs, setShelfs] = useState<Shelf[]>([]);
     const [packages, setPackages] = useState<Package[]>([]);
 
-    function intersection (packages: Package[], point: Point) {
+    function packageIntersection (packages: Package[], point: Point): Package | null {
         for(let pack of packages) {
-            if(Math.abs(point.x - pack.position.x) <= 20 && Math.abs(point.y - pack.position.y) <= 20) {
-                setChoosen(pack)
-                return true
-            }
+            if(Math.abs(point.x - pack.position.x) <= 20 && Math.abs(point.y - pack.position.y) <= 20)
+                return pack
         }
-        setChoosen(null)
-        return false
+        return null
     }
 
     function drawPoint (ctx: CanvasRenderingContext2D, point: Point, color: string) {
@@ -119,11 +118,6 @@ export const Map2D = (): JSX.Element => {
         drawShelfs(ctx, shelfs)
         drawPackages(ctx, packages)
         drawRobot(ctx, path[i])
-        // if(i < path.length - 1) {
-        //     setTimeout(() => {
-        //         update(canvas, ctx, path, shelfs, packages, i + 1)
-        //     }, 1000)
-        // }
     }
 
     function canvasClick (e: React.MouseEvent<HTMLCanvasElement>) {
@@ -133,8 +127,21 @@ export const Map2D = (): JSX.Element => {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
             }
-            intersection(packages, mousePos)
-            console.log(mousePos)
+            setChoosen(packageIntersection(packages, mousePos))
+        }
+    }
+
+    function canvasMove (e: React.MouseEvent<HTMLCanvasElement>) {
+        const canvas = canvasRef.current
+        if(canvas) {
+            const mousePos: Point = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            }
+            if(packageIntersection(packages, mousePos))
+                setOverPackage(true)
+            else
+                setOverPackage(false)
         }
     }
 
@@ -145,38 +152,6 @@ export const Map2D = (): JSX.Element => {
     path.push({ x: 250, y: 300 })
     path.push({ x: 500, y: 300 })
     path.push({ x: 500, y: 400 })
-    // let packages: Package[] = []
-    // packages.push({
-    //     position: { x: 125, y: 80 }
-    // })
-    // packages.push({
-    //     position: { x: 425, y: 380 }
-    // })
-    // let shelfs: Shelf[] = []
-    // shelfs.push({
-    //     upLeft: { x: 100, y: 50 },
-    //     upRight: { x: 150, y: 50 },
-    //     downLeft: { x: 100, y: 150 },
-    //     downRight: { x: 150, y: 150 },
-    // })
-    // shelfs.push({
-    //     upLeft: { x: 100, y: 250 },
-    //     upRight: { x: 150, y: 250 },
-    //     downLeft: { x: 100, y: 450 },
-    //     downRight: { x: 150, y: 450 },
-    // })
-    // shelfs.push({
-    //     upLeft: { x: 400, y: 50 },
-    //     upRight: { x: 450, y: 50 },
-    //     downLeft: { x: 400, y: 250 },
-    //     downRight: { x: 450, y: 250 },
-    // })
-    // shelfs.push({
-    //     upLeft: { x: 400, y: 350 },
-    //     upRight: { x: 450, y: 350 },
-    //     downLeft: { x: 400, y: 450 },
-    //     downRight: { x: 450, y: 450 },
-    // })
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     useEffect(() => {
@@ -188,29 +163,39 @@ export const Map2D = (): JSX.Element => {
         }
     })
 
+    useEffect(() => {
+        loadUsers()
+    }, [])
 
     const loadUsers = () => fetch("http://localhost:4000/store")
         .then(res => res.json())
         .then(
             (result) => {
-                setIsFetched(true)
-                setSize(result.size)
-                setPackages(result.packages)
-                setShelfs(result.shelfs)
-                return result
+                setTimeout(() => {
+                    setIsFetched(true)
+                    setSize(result.size)
+                    setPackages(result.packages)
+                    setShelfs(result.shelfs)
+                    return result
+                }, 2000)
             },
             (error) => {
-                console.log(error)
+                console.log(error.message)
+                setIsError(true)
             }
         )
+        .catch((error) => {
+            console.log(error.message)
+            setIsError(true)
+        })
 
     return (
         <div className="flex justify-around flex-wrap mt-10 px-10">
             { isFetched ?
-                <div>
-                    <canvas className="border-2 border-solid border-black" width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick }></canvas>
+                <>
+                    <canvas className="border-2 border-solid border-black" style={ { cursor: overPackage ? "pointer" : "auto" } } width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick } onMouseMove={ canvasMove }></canvas>
                     <div className="flex-1 justify-center items-center">
-                        <div className="">
+                        <div>
                             { choosen === null ?
                                 <div>NO SELECTED PRODUCT</div>
                                 :
@@ -221,31 +206,7 @@ export const Map2D = (): JSX.Element => {
                             }
                         </div>
                     </div>
-                </div> : <Async promiseFn={ loadUsers }>
-                    { ({ data, error, isLoading }) => {
-                        if(isLoading) return "Loading..."
-                        if(error) return `Something went wrong: ${error.message}`
-                        if(data)
-                            return (
-                                <div>
-                                    <canvas className="border-2 border-solid border-black" width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick }></canvas>
-                                    <div className="flex-1 justify-center items-center">
-                                        <div className="">
-                                            { choosen === null ?
-                                                <div>NO SELECTED PRODUCT</div>
-                                                :
-                                                <div>
-                                                    <div>x: { choosen.position.x }</div>
-                                                    <div>y: { choosen.position.y }</div>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        return null
-                    } }
-                </Async> }
+                </> : isError ? <div>Error occured</div> : <PacmanLoader size={ 50 } color={ "#42f57e" } /> }
         </div>
     )
 }
