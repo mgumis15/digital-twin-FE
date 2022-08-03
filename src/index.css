@@ -2,11 +2,19 @@
 @tailwind components;
 @tailwind utilities; 
 
+
 @layer components{
     .navlinkText {
-        @apply block py-2 pr-4 pl-3 bg-green-200 text-gray-400 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-400 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-400 w-4 md:w-8 lg:w-12 rounded-xl text-center h-full
+        @apply text-white block py-2 px-4 h-full w-full box-border
     }
     .navlinkTextActive{
-        @apply  bg-cyan-500
+        @apply  border-b-2 box-border border-sky-500
     }
+    /* .App{
+        @apply  min-h-screen dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800
+    } */
+}
+
+#root{
+    height: 100vh;
 }

@@ -1,4 +1,3 @@
-
 export const Logs =():JSX.Element=>{
     return(
         <>
