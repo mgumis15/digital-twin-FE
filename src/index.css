@@ -5,7 +5,7 @@
 
 @layer components{
     .navlinkText {
-        @apply text-white block py-2 px-4 h-full w-full box-border
+        @apply  block py-2 px-4 h-10  text-center text-lg text-white box-border hover:bg-gray-400 hover:bg-opacity-20 rounded select-none transition-colors
     }
     .navlinkTextActive{
         @apply  border-b-2 box-border border-sky-500

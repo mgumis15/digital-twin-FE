@@ -37,7 +37,6 @@ export const useItemsSearch = (query:string, pageNumber:number)=>{
                     
                    return [...prevItems,...data.slice(prevItems.length,prevItems.length+10)]
                 })
-                console.log(items.length,data.length)
                 
                 setLoading(false)
             })
