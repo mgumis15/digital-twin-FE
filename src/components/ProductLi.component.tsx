@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react"
-import { Product } from "../pages/store/Product.interface"
+import { Product } from "../interfaces/Product.interface"
 import { NamedLabel } from "./NamedLabel.component"
 export const ProductLi =forwardRef((props:{product:Product,handleClick:Function},ref:React.Ref<HTMLDivElement>)=>{
     const product:Product=props.product

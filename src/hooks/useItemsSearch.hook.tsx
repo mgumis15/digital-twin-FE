@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Product } from "../pages/store/Product.interface";
-export const useItemsSearch = (query:string, pageNumber:number)=>{
+export const useItemsSearch = (from:string,query:string, pageNumber:number)=>{
     const [loading, setLoading]= useState(true)
     const [error, setError]= useState(true)
     const [items,setItems]=useState<Array<any>>([])
@@ -17,7 +16,7 @@ export const useItemsSearch = (query:string, pageNumber:number)=>{
         setLoading(true)
         setError(false)
         setTimeout(()=>{
-            fetch("fakeData.json",{
+            fetch(from,{
                 headers:{
                     "Content-Type":"application/json",
                     "Accept":"application/json"
@@ -28,7 +27,7 @@ export const useItemsSearch = (query:string, pageNumber:number)=>{
                 setItems(prevItems=>{
                     
                     data=data.filter((item:any)=>{
-                        return item.id.toString().startsWith(query) || item.product_info.includes(query)
+                        return item.id.toString().startsWith(query) || item.product_info?.includes(query)
 
                     })
                     if(items.length>=data.length) setHasMore(false)

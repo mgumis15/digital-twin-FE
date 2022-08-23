@@ -5,5 +5,6 @@ export interface Product{
     localization_x: number,
     localization_y: number,
     created_at: string,
-    updated_at: string
+    updated_at: string,
+    interfaceType:"Product"
 }

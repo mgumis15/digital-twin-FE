@@ -1,7 +1,7 @@
 import { Map2D } from './pages/Maps/map2D/map2D.page';
-import { Store } from './pages/store/store.page';
-import { Logs } from './pages/logs/logs.page';
-import { Home } from './pages/home/home.page';
+import { StorePage } from './pages/store/StorePage.page';
+import { LogsPage } from './pages/logs/LogsPage.page';
+import { HomePage } from './pages/home/HomePage.page';
 import { Navbar } from './components/Navbar.component';
 import { PageNotFound } from './pages/error/pageNotFound.page';
 import { Routes,Route } from 'react-router-dom';
@@ -11,10 +11,10 @@ function App() {
     <div className="App dark">
     <Navbar/>
         <Routes>
-          <Route path='/' element={<Home/>}/>
+          <Route path='/' element={<HomePage/>}/>
           <Route path='/map' element={<Map2D/>}/>
-          <Route path='/store' element={<Store/>}/>
-          <Route path='/logs' element={<Logs/>}/>
+          <Route path='/store' element={<StorePage/>}/>
+          <Route path='/logs' element={<LogsPage/>}/>
           <Route path='*' element={<PageNotFound/>}/>
         </Routes>
     </div>
