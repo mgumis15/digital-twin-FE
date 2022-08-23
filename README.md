@@ -1,6 +1,6 @@
 ## Digital-Twin frontend
 
-Digital-Twin frontend Next.js with Typescript.
+Digital-Twin frontend React with Typescript.
 
 ### Workflow and good practice
 
