@@ -1,0 +1,60 @@
+{
+    "store": {
+        "size": {
+            "h": 500,
+            "w": 1000
+        },
+        "packages": [
+            {
+                "position": {
+                    "x": 125,
+                    "y": 80
+                }
+            },
+            {
+                "position": {
+                    "x": 425,
+                    "y": 380
+                }
+            }
+        ],
+        "shelfs": [
+            {
+                "startPoint": {
+                    "x": 100,
+                    "y": 50
+                },
+                "shape": "rectangular",
+                "width": 50,
+                "height": 100
+            },
+            {
+                "startPoint": {
+                    "x": 100,
+                    "y": 250
+                },
+                "shape": "rectangular",
+                "width": 50,
+                "height": 200
+            },
+            {
+                "startPoint": {
+                    "x": 400,
+                    "y": 50
+                },
+                "shape": "rectangular",
+                "width": 50,
+                "height": 200
+            },
+            {
+                "startPoint": {
+                    "x": 400,
+                    "y": 350
+                },
+                "shape": "rectangular",
+                "width": 50,
+                "height": 100
+            }
+        ]
+    }
+}

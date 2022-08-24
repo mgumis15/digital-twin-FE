@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { useEffect } from 'react'
 import {ReactComponent as AnimatedIndicator } from '../assets/images/ActivityIndicator.svg'
 export const ActivityIndicator =()=>{
     return(
