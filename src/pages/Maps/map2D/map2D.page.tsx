@@ -13,10 +13,10 @@ interface Package {
 }
 
 interface Shelf {
-    upLeft: Point,
-    upRight: Point,
-    downLeft: Point,
-    downRight: Point
+    startPoint: Point,
+    shape: String,
+    width: number,
+    height: number
 }
 
 interface Size {
@@ -71,23 +71,21 @@ export const Map2D = (): JSX.Element => {
     function drawShelfs (ctx: CanvasRenderingContext2D, shelfs: Shelf[]) {
         ctx.fillStyle = "#964B00"
         for(let shelf of shelfs) {
-            ctx.beginPath()
-            ctx.moveTo(shelf.upLeft.x, shelf.upLeft.y)
-            ctx.lineTo(shelf.upRight.x, shelf.upRight.y)
-            ctx.lineTo(shelf.downRight.x, shelf.downRight.y)
-            ctx.lineTo(shelf.downLeft.x, shelf.downLeft.y)
-            ctx.closePath()
-            ctx.fill()
+            if(shelf.shape === "rectangular") {
+                const { x, y } = shelf.startPoint
+                ctx.beginPath()
+                ctx.rect(x, y, shelf.width, shelf.height)
+                ctx.closePath()
+                ctx.fill()
+            }
         }
     }
 
     function drawFrame (ctx: CanvasRenderingContext2D, shelf: Shelf) {
         ctx.strokeStyle = "#03fc35"
+        const { x, y } = shelf.startPoint
         ctx.beginPath()
-        ctx.moveTo(shelf.upLeft.x, shelf.upLeft.y)
-        ctx.lineTo(shelf.upRight.x, shelf.upRight.y)
-        ctx.lineTo(shelf.downRight.x, shelf.downRight.y)
-        ctx.lineTo(shelf.downLeft.x, shelf.downLeft.y)
+        ctx.rect(x, y, shelf.width, shelf.height)
         ctx.closePath()
         ctx.stroke()
     }
@@ -96,10 +94,10 @@ export const Map2D = (): JSX.Element => {
         for(let pack of packages) {
             if(JSON.stringify(pack) === JSON.stringify(choosen)) {
                 let shelf: Shelf = {
-                    upLeft: { x: pack.position.x - robotSize / 2, y: pack.position.y - robotSize / 2 },
-                    upRight: { x: pack.position.x + robotSize / 2, y: pack.position.y - robotSize / 2 },
-                    downRight: { x: pack.position.x + robotSize / 2, y: pack.position.y + robotSize / 2 },
-                    downLeft: { x: pack.position.x - robotSize / 2, y: pack.position.y + robotSize / 2 },
+                    startPoint: { x: pack.position.x - robotSize / 2, y: pack.position.y - robotSize / 2 },
+                    shape: "rectangular",
+                    width: robotSize,
+                    height: robotSize
                 }
                 drawFrame(ctx, shelf)
             }
@@ -177,7 +175,7 @@ export const Map2D = (): JSX.Element => {
                     setPackages(result.packages)
                     setShelfs(result.shelfs)
                     return result
-                }, 2000)
+                }, 500)
             },
             (error) => {
                 console.log(error.message)
@@ -189,22 +187,30 @@ export const Map2D = (): JSX.Element => {
             setIsError(true)
         })
 
+    function pickUpPackage () {
+        if(choosen) {
+            alert(`Robot picking package: x = ${choosen.position.x} y = ${choosen.position.y}`)
+            console.log("send request")
+        }
+    }
+
     return (
-        <div className="flex justify-around flex-wrap mt-10 px-10">
+        <div className="flex justify-around flex-wrap mt-10 px-10 gap-10">
             { isFetched ?
                 <>
                     <canvas className="border-2 border-solid border-black" style={ { cursor: overPackage ? "pointer" : "auto" } } width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick } onMouseMove={ canvasMove }></canvas>
                     <div className="flex-1 justify-center items-center">
-                        <div>
+                        <>
                             { choosen === null ?
-                                <div>NO SELECTED PRODUCT</div>
+                                <div className="flex justify-center items-center">NO SELECTED PRODUCT</div>
                                 :
-                                <div>
-                                    <div>x: { choosen.position.x }</div>
-                                    <div>y: { choosen.position.y }</div>
+                                <div className="flex flex-col">
+                                    <div className="">x: { choosen.position.x }</div>
+                                    <div className="">y: { choosen.position.y }</div>
+                                    <button className="w-1/2 bg-gray-600" onClick={ pickUpPackage }>TAKE</button>
                                 </div>
                             }
-                        </div>
+                        </>
                     </div>
                 </> : isError ? <div>Error occured</div> : <PacmanLoader size={ 50 } color={ "#42f57e" } /> }
         </div>

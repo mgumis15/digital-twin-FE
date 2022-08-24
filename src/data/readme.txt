@@ -1,0 +1,1 @@
+json-server --watch -p 4000 src/data/store.json
