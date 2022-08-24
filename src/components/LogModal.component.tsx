@@ -1,5 +1,3 @@
-import React from 'react'
-import { QRCodeSVG } from 'qrcode.react'
 import { Log, LogType } from '../interfaces/Log.interface'
 import { NamedLabel } from './NamedLabel.component'
 
