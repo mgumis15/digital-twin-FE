@@ -5,12 +5,13 @@ export interface   NamedLabelProps{
     blackTheme?:boolean
     shortened?:boolean
     clickHandler?:Function
-    fullWidth?:boolean
+    widthClass?:string
+    
 } 
-export const NamedLabel = ({description, text,blackTheme=false, styleClasses='',shortened=true,clickHandler=undefined,fullWidth=false}:NamedLabelProps)=>{
+export const NamedLabel = ({description, text,blackTheme=false, styleClasses='',shortened=true,clickHandler=undefined,widthClass=undefined}:NamedLabelProps)=>{
 
     return(
-        <div className={`flex flex-col ${fullWidth?"max-w-full":"max-w-[70%]"} p-1 ${clickHandler?'border-b-2 box-border border-sky-500 cursor-pointer':''}  rounded`} onClick={()=>{
+        <div className={` flex flex-col ${widthClass?widthClass:"w-fit"} p-1 ${clickHandler?'border-b-2 box-border border-sky-500 cursor-pointer':''}  rounded`} onClick={()=>{
             if(clickHandler)clickHandler()
         }}>
             <p className={`${blackTheme?"text-gray-100":"text-gray-500"} text-left text-xs leading-3 w-full`}>{description}</p>

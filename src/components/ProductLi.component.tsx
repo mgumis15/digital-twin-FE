@@ -9,8 +9,8 @@ export const ProductLi =forwardRef((props:{product:Product,handleClick:Function}
         hover:shadow-sky-200 hover:border-sky-300 transition-colors
         `} ref={ref} onClick={()=>{handleClick()}}>
             
-            <NamedLabel description="ID" text={product.id.toString() } styleClasses="text-lg font-bold"/>
-            <NamedLabel description="Info" text={product.product_info }/>
+            <NamedLabel description="ID" text={product.id.toString() } styleClasses=" font-bold" widthClass="w-18"/>
+            <NamedLabel description="Info" text={product.product_info } widthClass="w-96"/>
 
         </div>
     )
