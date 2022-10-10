@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import robot from "../../../assets/images/robot.png"
 import packageImg from "../../../assets/images/package.png"
-import { PacmanLoader } from "react-spinners";
-
-interface Point {
-    x: number,
-    y: number
-}
+import {ActivityIndicator} from "../../../components/ActivityIndicator.component"
+import {Point} from "../../../interfaces/Point.interface"
 
 interface Package {
     position: Point
@@ -212,7 +208,7 @@ export const Map2D = (): JSX.Element => {
                             }
                         </>
                     </div>
-                </> : isError ? <div>Error occured</div> : <PacmanLoader size={ 50 } color={ "#42f57e" } /> }
+                </> : isError ? <div>Error occured</div> : <ActivityIndicator/> }
         </div>
     )
 }

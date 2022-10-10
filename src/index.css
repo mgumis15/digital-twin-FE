@@ -17,4 +17,8 @@
 
 #root{
     height: 100vh;
+    min-width: 250px;
+}
+body > *{
+    font-family: sans-serif;
 }

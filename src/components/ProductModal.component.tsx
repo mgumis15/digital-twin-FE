@@ -12,7 +12,7 @@ export const ProductModal = (props:{product:Product}) => {
     }
 
   return (
-    <div className="flex justify-center items-center  flex-col max-h-[90%] min-w-[240px]">
+    <div className="flex justify-center items-center  flex-col max-h-[90%] min-w-[240px] ">
         <div className="bg-white w-fit ">
             <QRCodeSVG value={product.qr_code} size={128}/>
         </div>
@@ -20,7 +20,7 @@ export const ProductModal = (props:{product:Product}) => {
         <div className='flex flex-col mt-6 sm:flex-row  sm:items-center justify-between w-9/12 m-4'>
         <NamedLabel description="ID" text={product.id.toString() } styleClasses="font-bold" blackTheme={true}/>
   
-        <NamedLabel description="Position" shortened={false} text={"x:"+product.localization_x.toString()+" y:"+product.localization_y.toString() } styleClasses="font-bold" blackTheme={true} clickHandler={moveToMap}/>
+        <NamedLabel description="Position" shortened={false} text={"x:"+product.localization.x.toString()+" y:"+product.localization.y.toString() } styleClasses="font-bold" blackTheme={true} clickHandler={moveToMap}/>
         </div>
         <div className='flex flex-col mt-2 sm:flex-row items-end sm:items-center justify-between w-9/12 m-4'>
         <NamedLabel description="Created at" text={product.created_at.toString() } styleClasses="font-bold" blackTheme={true}/>

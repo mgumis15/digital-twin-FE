@@ -18,7 +18,7 @@ export const LogModal = (props:{log:Log}) => {
           <NamedLabel description="ID" text={log.id.toString() } styleClasses=" font-bold" blackTheme={true}/>
           <NamedLabel description="Product ID" text={log.product_id.toString() } styleClasses=" font-bold" blackTheme={true}/>
     
-          <NamedLabel description="Position" shortened={false} text={"x:"+log.localization_x.toString()+" y:"+log.localization_y.toString() } styleClasses=" font-bold" blackTheme={true} clickHandler={moveToMap}/>
+          <NamedLabel description="Position" shortened={false} text={"x:"+log.localization.x.toString()+" y:"+log.localization.y.toString() } styleClasses=" font-bold" blackTheme={true} clickHandler={moveToMap}/>
           </div>
           <div className='flex flex-col mt-2 sm:flex-row  items-center justify-between w-9/12 m-4'>
           <NamedLabel description="Created at" text={log.created_at.toString() } styleClasses=" font-bold" blackTheme={true}/>

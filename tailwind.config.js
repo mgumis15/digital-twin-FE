@@ -13,6 +13,9 @@ module.exports = {
         'height': 'height'
       }
     },
+    screens:{
+      'sm':'700px'
+    }
   },
   plugins: [],
 }

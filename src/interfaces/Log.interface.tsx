@@ -1,9 +1,9 @@
+import { Point } from "./Point.interface"
 export interface Log{
     id: number,
     product_id: number,
     type: LogType,
-    localization_x: number,
-    localization_y: number,
+    localization:Point,
     created_at: string,
     interfaceType:"Log"
 
