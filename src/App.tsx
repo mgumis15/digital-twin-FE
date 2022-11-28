@@ -1,4 +1,5 @@
 import { Map2D } from './pages/Maps/map2D/map2D.page';
+import { Map3D } from './pages/Maps/map3D/map3D.page';
 import { StorePage } from './pages/store/StorePage.page';
 import { LogsPage } from './pages/logs/LogsPage.page';
 import { HomePage } from './pages/home/HomePage.page';
@@ -12,7 +13,8 @@ function App() {
     <Navbar/>
         <Routes>
           <Route path='/' element={<HomePage/>}/>
-          <Route path='/map' element={<Map2D/>}/>
+          <Route path='/maps/map2D' element={<Map2D/>}/>
+          <Route path='/maps/map3D' element={<Map3D/>}/>
           <Route path='/store' element={<StorePage/>}/>
           <Route path='/logs' element={<LogsPage/>}/>
           <Route path='*' element={<PageNotFound/>}/>

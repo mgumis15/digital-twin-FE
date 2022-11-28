@@ -43,7 +43,7 @@ export const LogsPage =():JSX.Element=>{
     },[loading,hasMore])
     
        return(
-        <div ref={ref} className="w-full flex justify-center">
+        <div ref={ref} className="w-full flex justify-center ">
             <Modal.Frame open={openModal} onClose={()=>{
                 setChoosenLog(null)
                 setOpenModal(prevOpenModal=>!prevOpenModal)                
