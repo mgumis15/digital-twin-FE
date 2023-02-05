@@ -24,7 +24,7 @@ export const LogsPage =():JSX.Element=>{
         error,
         items,
         hasMore
-    }=useItemsSearch("fakeLogs.json",searchInput,pageNumber)
+    }=useItemsSearch("http://localhost:4000/logs?",searchInput,pageNumber)
 
     const openLogModal = (log:Log)=>{
         setChoosenLog(log)

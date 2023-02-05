@@ -6,7 +6,7 @@ export const ProductLi =forwardRef((props:{product:Product,handleClick:Function}
     const handleClick:Function=props.handleClick
     return(
         <div className={`flex justify-start align-middle text-center items-center space-x-4 h-16  border-2 p-4 m-2 rounded-md shadow-sm odd:bg-gray-50
-        hover:shadow-sky-200 hover:border-sky-300 transition-colors
+        hover:shadow-sky-200 hover:border-sky-300 transition-colors cursor-pointer
         `} ref={ref} onClick={()=>{handleClick()}}>
             
             <NamedLabel description="ID" text={product.id.toString() } styleClasses=" font-bold" widthClass="w-18"/>

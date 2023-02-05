@@ -24,7 +24,7 @@ export const StorePage =():JSX.Element=>{
         error,
         items,
         hasMore
-    }=useItemsSearch("fakeData.json",searchInput,pageNumber)
+    }=useItemsSearch("http://localhost:4000/products?",searchInput,pageNumber)
 
     const openProductModal = (product:Product)=>{
         setChoosenProduct(product)

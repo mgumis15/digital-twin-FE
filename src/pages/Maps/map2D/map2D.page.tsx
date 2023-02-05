@@ -3,22 +3,7 @@ import robot from "../../../assets/images/robot.png"
 import packageImg from "../../../assets/images/package.png"
 import {ActivityIndicator} from "../../../components/ActivityIndicator.component"
 import {Point} from "../../../interfaces/Point.interface"
-
-interface Package {
-    position: Point
-}
-
-interface Shelf {
-    startPoint: Point,
-    shape: String,
-    width: number,
-    height: number
-}
-
-interface Size {
-    w: number,
-    h: number
-}
+import {Package,Shelf,Size} from  "../../../interfaces/Map.interfaces"
 
 const robotSize = 40
 const robotImage = new Image()

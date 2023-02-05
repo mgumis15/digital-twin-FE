@@ -5,41 +5,41 @@ export const useItemsSearch = (from:string,query:string, pageNumber:number)=>{
     const [items,setItems]=useState<Array<any>>([])
     const [hasMore,setHasMore]=useState<boolean>(true)
 
-
+    const controller = new AbortController()
+    const signal=controller.signal
     
     useEffect(()=>{
         setItems([])
     },[query])
 
-
+    const fetchData=()=>{
+        fetch(from + new URLSearchParams({query:query,page:pageNumber.toString()}),{
+            headers:{
+                "Content-Type":"application/json",
+                "Accept":"application/json"
+            },
+            method:'get',
+            signal:signal
+        }).then(res=>{
+            return res.json()
+        }).then(data=>{
+            setItems(prevItems=>{
+                setHasMore(data.hasMore)
+                return [...prevItems,...data.data]
+            })
+            setLoading(false)
+        })
+    }
     useEffect(()=>{
+        
+        
         setLoading(true)
         setError(false)
-        setTimeout(()=>{
-            fetch(from,{
-                headers:{
-                    "Content-Type":"application/json",
-                    "Accept":"application/json"
-                }
-            }).then(res=>{
-                return res.json()
-            }).then(data=>{
-                setItems(prevItems=>{
-                    
-                    data=data.filter((item:any)=>{
-                        return item.id.toString().startsWith(query) || item.product_info?.includes(query)
+        const fetchTimeout=setTimeout(fetchData,500);
+        
 
-                    })
-                    if(items.length>=data.length) setHasMore(false)
-                    else setHasMore(true)
-
-                    
-                   return [...prevItems,...data.slice(prevItems.length,prevItems.length+10)]
-                })
-                
-                setLoading(false)
-            })
-        },1000)
+        return ()=>clearTimeout(fetchTimeout)
+            
     },[query,pageNumber])
 
     return {loading,error,items,hasMore}
