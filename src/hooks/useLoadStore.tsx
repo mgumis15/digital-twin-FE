@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 export const useLoadStore = (from:string)=>{
     const [loading, setLoading]= useState(true)
     const [error, setError]= useState(true)
-    const [products,setProducts]=useState<Array<any>>([])
+    const [data,setData]=useState<Array<any>>([])
 
 
     
     useEffect(()=>{
-        setProducts([])
+        setData([])
     },[])
 
 
@@ -23,13 +23,17 @@ export const useLoadStore = (from:string)=>{
             }).then(res=>{
                 
                 return res.json()
-            }).then(data=>{
-                console.log(data)
-                setProducts(data.products)
+            }).then(resData=>{
+                console.log(resData)
+                
+                if(resData.products)
+                    setData(resData.products)
+                else
+                    setData(resData)
                 setLoading(false)
             })
         },1000)
     },[])
 
-    return {loading,error,products}
+    return {loading,error,data}
 }

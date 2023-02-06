@@ -12,6 +12,8 @@ export const Navbar = () :JSX.Element=>{
     const [active, setActive] = useState<boolean>(false);
     const [windowSize, setWindowSize] = useState(getWindowSize());
     const [mapMenuOpen, setMapMenuOpen] = useState(false);
+    const [isMap,setIsMap]=useState(false);
+
 
     useEffect(() => {
         function handleWindowResize() {
@@ -27,12 +29,15 @@ export const Navbar = () :JSX.Element=>{
         window.removeEventListener('resize', handleWindowResize);
         };
     }, []);
+
     const location = useLocation();
+    console.log(location)
     const activateHamburger=()=>{
         setActive(prev=>!prev)
     }
     useEffect(()=>{
     },[location])
+    
     return(
         <nav className={`bg-wgite border-gray-300 px-2 sm:px-4 py-3 dark:bg-gray-700  flex sm:flex-wrap flex-col sm:flex-row justify-center items-center mx-auto sticky w-full z-20`}>
             <div className='sm:absolute left-4 flex flex-row w-11/12 sm:w-auto justify-between'>

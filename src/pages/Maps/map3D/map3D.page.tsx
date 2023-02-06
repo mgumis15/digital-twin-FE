@@ -14,12 +14,8 @@ import { forEachChild } from "typescript";
 
 export const Map3D = (): JSX.Element => {
 
-  const  {
-    loading,
-    error,
-    products
-  }=useLoadStore("http://localhost:4000/products")
-
+  const products=useLoadStore("http://localhost:4000/products")
+  const warehouse=useLoadStore("http://localhost:4000/warehouse")
     return (
         <div className="bg-slate-900 h-screen overflow-hidden">
             <Canvas>
@@ -36,18 +32,18 @@ export const Map3D = (): JSX.Element => {
             <Robot/>
             <Grid/>
             {
-              products
+              products.data
               .map((product:Product,i)=>{
                  return <ProductBox product={product} key={product.id}/>
               })
             }
             </Canvas>
-            {loading && 
-            <div>
-              <div className="z-10  absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-150"><ActivityIndicator /></div>
+            {(products.loading || warehouse.loading) && 
+            <div className="left-0 top-0 z-10 bg-black bg-opacity-50 absolute w-full h-full ">
+              <div className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-150"><ActivityIndicator /></div>
             </div>
             }
-            {error && <h1>Error</h1>}
+            {(products.error || warehouse.error) &&  <h1>Error</h1>}
         </div>
             )
 }

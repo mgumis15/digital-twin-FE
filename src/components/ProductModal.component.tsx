@@ -2,6 +2,7 @@ import React from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Product } from '../interfaces/Product.interface'
 import { NamedLabel } from './NamedLabel.component'
+import { TruckIcon } from './TruckIcon.component'
 
 
 export const ProductModal = (props:{product:Product}) => {
@@ -33,15 +34,9 @@ export const ProductModal = (props:{product:Product}) => {
         <div className=" rounded my-4 h-[1px] bg-gray-100 w-11/12"/>
 
         <div className='w-9/12 text-red-600 font-bold flex justify-between'>
-          <button>
-            Fetch
-          </button>
-          <button>
-            Destroy
-          </button>
-          <button>
-            Check
-          </button>
+        <TruckIcon type="Destroy" handler={()=>{console.log("Destroy")}}></TruckIcon>
+        <TruckIcon type="Fetch" handler={()=>{console.log("Fetch")}}></TruckIcon>
+        <TruckIcon type="Check" handler={()=>{console.log("Check")}}></TruckIcon>
         </div>
     </div>
   )
