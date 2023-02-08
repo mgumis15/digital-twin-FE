@@ -1,14 +1,14 @@
 import { Point } from "./Point.interface"
-export interface Log{
+export interface Log {
     id: number,
     product_id: number,
     type: LogType,
-    localization:Point,
+    localization: Point,
     created_at: string,
-    interfaceType:"Log"
+    interfaceType: "Log"
 
 }
-export enum LogType{
+export enum LogType {
     SUCCESS,
     WARNING
 }

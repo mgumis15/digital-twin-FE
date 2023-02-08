@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react"
 import robot from "../../../assets/images/robot.png"
 import packageImg from "../../../assets/images/package.png"
-import {ActivityIndicator} from "../../../components/ActivityIndicator.component"
-import {Point} from "../../../interfaces/Point.interface"
-import {Package,Shelf,Size} from  "../../../interfaces/Map.interfaces"
+import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
+import { Point } from "../../../interfaces/Point.interface"
+import { Package, Shelf, Size } from "../../../interfaces/Map.interfaces"
 
 const robotSize = 40
 const robotImage = new Image()
@@ -12,23 +12,23 @@ const packageImage = new Image()
 packageImage.src = packageImg
 
 export const Map2D = (): JSX.Element => {
-    const [isFetched, setIsFetched] = useState<Boolean>(false);
-    const [isError, setIsError] = useState<Boolean>(false);
-    const [size, setSize] = useState<Size>({ w: 0, h: 0 });
-    const [choosen, setChoosen] = useState<Package | null>(null);
-    const [overPackage, setOverPackage] = useState<Boolean>(false);
-    const [shelfs, setShelfs] = useState<Shelf[]>([]);
-    const [packages, setPackages] = useState<Package[]>([]);
+    const [isFetched, setIsFetched] = useState<Boolean>(false)
+    const [isError, setIsError] = useState<Boolean>(false)
+    const [size, setSize] = useState<Size>({ w: 0, h: 0 })
+    const [choosen, setChoosen] = useState<Package | null>(null)
+    const [overPackage, setOverPackage] = useState<Boolean>(false)
+    const [shelfs, setShelfs] = useState<Shelf[]>([])
+    const [packages, setPackages] = useState<Package[]>([])
 
-    function packageIntersection (packages: Package[], point: Point): Package | null {
-        for(let pack of packages) {
-            if(Math.abs(point.x - pack.position.x) <= 20 && Math.abs(point.y - pack.position.y) <= 20)
+    function packageIntersection(packages: Package[], point: Point): Package | null {
+        for (let pack of packages) {
+            if (Math.abs(point.x - pack.position.x) <= 20 && Math.abs(point.y - pack.position.y) <= 20)
                 return pack
         }
         return null
     }
 
-    function drawPoint (ctx: CanvasRenderingContext2D, point: Point, color: string) {
+    function drawPoint(ctx: CanvasRenderingContext2D, point: Point, color: string) {
         ctx.fillStyle = color
         ctx.beginPath()
         ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI)
@@ -36,11 +36,11 @@ export const Map2D = (): JSX.Element => {
         ctx.closePath()
     }
 
-    function drawPath (ctx: CanvasRenderingContext2D, path: Point[]) {
+    function drawPath(ctx: CanvasRenderingContext2D, path: Point[]) {
         ctx.strokeStyle = "#000000"
         ctx.beginPath()
         ctx.moveTo(path[0].x, path[0].y)
-        for(let i = 1; i < path.length; i++)
+        for (let i = 1; i < path.length; i++)
             ctx.lineTo(path[i].x, path[i].y)
         ctx.stroke()
         ctx.closePath()
@@ -49,10 +49,10 @@ export const Map2D = (): JSX.Element => {
         drawPoint(ctx, path[path.length - 1], "#fc0373")
     }
 
-    function drawShelfs (ctx: CanvasRenderingContext2D, shelfs: Shelf[]) {
+    function drawShelfs(ctx: CanvasRenderingContext2D, shelfs: Shelf[]) {
         ctx.fillStyle = "#964B00"
-        for(let shelf of shelfs) {
-            if(shelf.shape === "rectangular") {
+        for (let shelf of shelfs) {
+            if (shelf.shape === "rectangular") {
                 const { x, y } = shelf.startPoint
                 ctx.beginPath()
                 ctx.rect(x, y, shelf.width, shelf.height)
@@ -62,7 +62,7 @@ export const Map2D = (): JSX.Element => {
         }
     }
 
-    function drawFrame (ctx: CanvasRenderingContext2D, shelf: Shelf) {
+    function drawFrame(ctx: CanvasRenderingContext2D, shelf: Shelf) {
         ctx.strokeStyle = "#03fc35"
         const { x, y } = shelf.startPoint
         ctx.beginPath()
@@ -71,9 +71,9 @@ export const Map2D = (): JSX.Element => {
         ctx.stroke()
     }
 
-    function drawPackages (ctx: CanvasRenderingContext2D, packages: Package[]) {
-        for(let pack of packages) {
-            if(JSON.stringify(pack) === JSON.stringify(choosen)) {
+    function drawPackages(ctx: CanvasRenderingContext2D, packages: Package[]) {
+        for (let pack of packages) {
+            if (JSON.stringify(pack) === JSON.stringify(choosen)) {
                 let shelf: Shelf = {
                     startPoint: { x: pack.position.x - robotSize / 2, y: pack.position.y - robotSize / 2 },
                     shape: "rectangular",
@@ -86,22 +86,22 @@ export const Map2D = (): JSX.Element => {
         }
     }
 
-    function drawRobot (ctx: CanvasRenderingContext2D, point: Point) {
+    function drawRobot(ctx: CanvasRenderingContext2D, point: Point) {
         ctx.drawImage(robotImage, point.x - robotSize / 2, point.y - robotSize / 2, robotSize, robotSize)
     }
 
-    function update (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, path: Point[], shelfs: Shelf[], packages: Package[], i: number) {
+    function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, path: Point[], shelfs: Shelf[], packages: Package[], i: number) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        if(path.length > 1)
+        if (path.length > 1)
             drawPath(ctx, path)
         drawShelfs(ctx, shelfs)
         drawPackages(ctx, packages)
         drawRobot(ctx, path[i])
     }
 
-    function canvasClick (e: React.MouseEvent<HTMLCanvasElement>) {
+    function canvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
         const canvas = canvasRef.current
-        if(canvas) {
+        if (canvas) {
             const mousePos: Point = {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
@@ -110,14 +110,14 @@ export const Map2D = (): JSX.Element => {
         }
     }
 
-    function canvasMove (e: React.MouseEvent<HTMLCanvasElement>) {
+    function canvasMove(e: React.MouseEvent<HTMLCanvasElement>) {
         const canvas = canvasRef.current
-        if(canvas) {
+        if (canvas) {
             const mousePos: Point = {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
             }
-            if(packageIntersection(packages, mousePos))
+            if (packageIntersection(packages, mousePos))
                 setOverPackage(true)
             else
                 setOverPackage(false)
@@ -135,9 +135,9 @@ export const Map2D = (): JSX.Element => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     useEffect(() => {
         const canvas = canvasRef.current
-        if(canvas) {
+        if (canvas) {
             const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
-            if(ctx)
+            if (ctx)
                 update(canvas, ctx, path, shelfs, packages, Math.floor(Math.random() * path.length))
         }
     })
@@ -168,8 +168,8 @@ export const Map2D = (): JSX.Element => {
             setIsError(true)
         })
 
-    function pickUpPackage () {
-        if(choosen) {
+    function pickUpPackage() {
+        if (choosen) {
             alert(`Robot picking package: x = ${choosen.position.x} y = ${choosen.position.y}`)
             console.log("send request")
         }
@@ -177,23 +177,23 @@ export const Map2D = (): JSX.Element => {
 
     return (
         <div className="flex justify-around flex-wrap mt-10 px-10 gap-10">
-            { isFetched ?
+            {isFetched ?
                 <>
-                    <canvas className="border-2 border-solid border-black" style={ { cursor: overPackage ? "pointer" : "auto" } } width={ size.w } height={ size.h } ref={ canvasRef } onMouseDown={ canvasClick } onMouseMove={ canvasMove }></canvas>
+                    <canvas className="border-2 border-solid border-black" style={{ cursor: overPackage ? "pointer" : "auto" }} width={size.w} height={size.h} ref={canvasRef} onMouseDown={canvasClick} onMouseMove={canvasMove}></canvas>
                     <div className="flex-1 justify-center items-center">
                         <>
-                            { choosen === null ?
+                            {choosen === null ?
                                 <div className="flex justify-center items-center">NO SELECTED PRODUCT</div>
                                 :
                                 <div className="flex flex-col">
-                                    <div className="">x: { choosen.position.x }</div>
-                                    <div className="">y: { choosen.position.y }</div>
-                                    <button className="w-1/2 bg-gray-600" onClick={ pickUpPackage }>TAKE</button>
+                                    <div className="">x: {choosen.position.x}</div>
+                                    <div className="">y: {choosen.position.y}</div>
+                                    <button className="w-1/2 bg-gray-600" onClick={pickUpPackage}>TAKE</button>
                                 </div>
                             }
                         </>
                     </div>
-                </> : isError ? <div>Error occured</div> : <ActivityIndicator/> }
+                </> : isError ? <div>Error occured</div> : <ActivityIndicator />}
         </div>
     )
 }

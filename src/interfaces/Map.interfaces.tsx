@@ -1,4 +1,4 @@
-import {Point} from "../interfaces/Point.interface"
+import { Point } from "../interfaces/Point.interface"
 interface Package {
     position: Point
 }
@@ -15,4 +15,4 @@ interface Size {
     h: number
 }
 
-export type {Package,Shelf,Size};
+export type { Package, Shelf, Size }
