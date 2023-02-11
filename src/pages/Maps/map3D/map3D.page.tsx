@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from "react"
-import { Canvas, useThree, Vector3 } from '@react-three/fiber'
-import { Instances, Text, Instance, OrbitControls, Cone, RoundedBox, Text3D } from "@react-three/drei"
+import React, { useEffect, useState } from "react"
+import { Canvas } from '@react-three/fiber'
+import { Text, OrbitControls, Cone, RoundedBox } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
-import { Package, Shelf, Size } from "../../../interfaces/Map.interfaces"
 import { Point as IPoint } from "../../../interfaces/Point.interface"
-import { group } from "console"
 import { Product } from "../../../interfaces/Product.interface"
 import { useLoadStore } from "../../../hooks/useLoadStore"
-import { forEachChild } from "typescript"
 import io from "socket.io-client"
 import { Shape } from "three"
 import { Modal } from "../../../components/Modal.component"
@@ -17,10 +14,12 @@ const socket = io("http://localhost:4001")
 
 export const Map3D = (): JSX.Element => {
   const [isConnected, setIsConnected] = useState(socket.connected)
-  const products = useLoadStore("http://localhost:4000/products")
   const [truckPosition, setTruckPosition] = useState<IPoint>({ x: 1, y: 1 })
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
+
+  const products = useLoadStore("http://localhost:4000/products")
+
 
   const openProductModal = (product: Product) => {
     setChoosenProduct(product)
@@ -42,6 +41,7 @@ export const Map3D = (): JSX.Element => {
     return () => {
       socket.off('connect')
       socket.off('disconnect')
+      socket.off('truckPosition')
     }
   }, [])
 
@@ -100,20 +100,18 @@ export const Map3D = (): JSX.Element => {
 }
 const ProductBox = (props: { product: Product, handleClick: Function }) => {
   const [hovered, setHovered] = useState(false)
-  const [clicked, setClicked] = useState(false)
 
   const product: Product = props.product
 
   return (
     <group key={"Product " + product.id} position={[-1 * (product.localization.x - 0.5), -0.5, product.localization.y - 0.5]}>
       <Text
-        // scale={[0.5, 0.5, 0.5]}
         fontSize={0.3}
         rotation={[Math.PI / 2, Math.PI, 0]}
         position={[0, 0.52, 0]}
-        color="black" // default
-        anchorX="center" // default
-        anchorY="middle" // default
+        color="black"
+        anchorX="center"
+        anchorY="middle"
         children={product.id}
         getObjectsByProperty={undefined}
         getVertexPosition={undefined} />
@@ -132,7 +130,6 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
         onPointerDown={e => {
           e.stopPropagation()
           props.handleClick()
-          setClicked(true)
         }}
 
         getObjectsByProperty={undefined} getVertexPosition={undefined}    >
@@ -147,18 +144,11 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
 }
 const Robot = (props: { position: IPoint }) => {
   const [hovered, setHovered] = useState(false)
-  const [clicked, setClicked] = useState(false)
-  const arrowShape = new Shape()
-  arrowShape.lineTo(0.5, -0.5)
-  arrowShape.lineTo(0, 0.5)
-  arrowShape.lineTo(-0.5, -0.5)
-
   return (
     <Cone
       position={[-1 * (props.position.x - 0.5), 0, props.position.y - 0.5]}
-      onPointerOver={f => setHovered(true)}
-      onPointerLeave={f => setHovered(false)}
-      onPointerDown={f => setClicked(true)}
+      onPointerOver={e => setHovered(true)}
+      onPointerLeave={e => setHovered(false)}
       args={[0.5, 1, 2, 2]}
       rotation={[Math.PI / 2, Math.PI / 2, 0]} getObjectsByProperty={undefined} getVertexPosition={undefined}>
       <meshBasicMaterial color={hovered ? "#7dfcf6" : "#0ea5e9"} />
@@ -166,9 +156,7 @@ const Robot = (props: { position: IPoint }) => {
 
   )
 }
-const Grid = ({ size = 25, lineWidth = 0.026, height = 0.5 }) => (
-  // Renders a grid and crosses as instances
-
+const Grid = ({ size = 25 }) => (
   <gridHelper args={[size, size, '#bbb', '#bbb']} position={[-12.5, -1, 12.5]} />
 
 )
