@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+    <path id="truckArrow" stroke="#000" stroke-width="1" stroke-linejoin="round" fill="#0ea5e9" d="
+    M 1,63
+    l 31,-16
+    l 31,16 
+    l -31,-63
+    z        
+    " />
+</svg>

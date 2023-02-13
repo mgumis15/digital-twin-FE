@@ -20,7 +20,7 @@
         ],
         "shelfs": [
             {
-                "startPoint": {
+                "startCords": {
                     "x": 100,
                     "y": 50
                 },
@@ -29,7 +29,7 @@
                 "height": 100
             },
             {
-                "startPoint": {
+                "startCords": {
                     "x": 100,
                     "y": 250
                 },
@@ -38,7 +38,7 @@
                 "height": 200
             },
             {
-                "startPoint": {
+                "startCords": {
                     "x": 400,
                     "y": 50
                 },
@@ -47,7 +47,7 @@
                 "height": 200
             },
             {
-                "startPoint": {
+                "startCords": {
                     "x": 400,
                     "y": 350
                 },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Canvas } from '@react-three/fiber'
-import { Text, OrbitControls, Cone, RoundedBox, Line, Plane } from "@react-three/drei"
+import { Text, OrbitControls, Cone, RoundedBox, Line } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
 import { Coords } from "../../../interfaces/Coords.interface"
 import { Product } from "../../../interfaces/Product.interface"
@@ -12,7 +12,7 @@ import { ProductModal } from "../../../components/ProductModal.component"
 
 const socket = io("http://localhost:4001")
 
-export const Map2D = (): JSX.Element => {
+export const Map3D = (): JSX.Element => {
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
   const [openModal, setOpenModal] = useState<boolean>(false)
@@ -66,22 +66,22 @@ export const Map2D = (): JSX.Element => {
           }
         </Modal.Body>
       </Modal.Frame>
-      <Canvas camera={{ fov: 45, position: [-12.5, 15, -12.5] }}>
+      <Canvas camera={{ fov: 45, position: [-12.5, 0, -25] }}>
         <pointLight color={"#fff"} position={[0, 7, 0]} intensity={0.7} />
         <pointLight color={"#fff"} position={[0, 7, 25]} intensity={0.5} />
         <pointLight color={"#fff"} position={[-25, 7, 0]} intensity={0.5} />
         <pointLight color={"#fff"} position={[-25, 7, 25]} intensity={0.7} />
         <OrbitControls
           zoomSpeed={1}
-          target={[-12.5, 15, 12.5]}
+          target={[-12.5, 0, 8]}
           minZoom={80}
           maxZoom={80}
           enablePan={true}
-          maxDistance={50}
+          maxDistance={40}
           dampingFactor={0.05}
-          minPolarAngle={0}
-          maxPolarAngle={0}
-          position={[-12.5, 15, 12.5]}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 4}
+          position={[-12.5, 0, 0]}
         />
         <Path path={currentPath} />
         <Robot position={truckPosition} />
@@ -110,11 +110,11 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
   const product: Product = props.product
 
   return (
-    <group key={"Product " + product.id} position={[-1 * (product.localization.x - 0.5), -1, product.localization.y - 0.5]}>
+    <group key={"Product " + product.id} position={[-1 * (product.localization.x - 0.5), -0.5, product.localization.y - 0.5]}>
       <Text
         fontSize={0.3}
         rotation={[Math.PI / 2, Math.PI, 0]}
-        position={[0, 0.02, 0]}
+        position={[0, 0.52, 0]}
         color="black"
         anchorX="center"
         anchorY="middle"
@@ -122,10 +122,9 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
         getObjectsByProperty={undefined}
         getVertexPosition={undefined} />
 
-      <Plane
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.95, 1, 0.95]}
+      <RoundedBox
 
+        radius={0.1}
         onPointerOver={e => {
           e.stopPropagation()
           setHovered(true)
@@ -142,7 +141,7 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
         getObjectsByProperty={undefined} getVertexPosition={undefined}    >
 
         <meshPhongMaterial color={hovered ? "#e69a3d" : "#eab676"} />
-      </Plane>
+      </RoundedBox>
     </group>
 
   )
@@ -152,7 +151,7 @@ const Path = (props: { path: Coords[] }) => {
   console.log(props.path)
   return (
     <Line
-      points={[[-0.5, -1, 1 - 0.5], [-0.5, -1, 12 - 0.5], [-1 * (0.5 + 10), -1, 12 - 0.5]]}
+      points={[[-0.5, -0.5, 1 - 0.5], [-0.5, -0.5, 12 - 0.5], [-1 * (0.5 + 10), -0.5, 12 - 0.5]]}
       color="red"
       lineWidth={3}
       dashed={false}
@@ -168,7 +167,7 @@ const Robot = (props: { position: Coords }) => {
   const [hovered, setHovered] = useState(false)
   return (
     <Cone
-      position={[-1 * (props.position.x - 0.5), -0.95, props.position.y - 0.5]}
+      position={[-1 * (props.position.x - 0.5), -0.4, props.position.y - 0.5]}
       onPointerOver={e => setHovered(true)}
       onPointerLeave={e => setHovered(false)}
       args={[0.5, 1, 2, 2]}
