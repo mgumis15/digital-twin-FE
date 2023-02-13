@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { Canvas } from '@react-three/fiber'
-import { Text, OrbitControls, Cone, RoundedBox } from "@react-three/drei"
+import { Text, OrbitControls, Cone, RoundedBox, Line } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
-import { Point as IPoint } from "../../../interfaces/Point.interface"
+import { Coords } from "../../../interfaces/Coords.interface"
 import { Product } from "../../../interfaces/Product.interface"
 import { useLoadStore } from "../../../hooks/useLoadStore"
 import io from "socket.io-client"
@@ -14,9 +14,10 @@ const socket = io("http://localhost:4001")
 
 export const Map3D = (): JSX.Element => {
   const [isConnected, setIsConnected] = useState(socket.connected)
-  const [truckPosition, setTruckPosition] = useState<IPoint>({ x: 1, y: 1 })
+  const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
+  const [currentPath, setcurrentPath] = useState<Coords[]>([])
 
   const products = useLoadStore("http://localhost:4000/products")
 
@@ -38,10 +39,15 @@ export const Map3D = (): JSX.Element => {
     socket.on('truckPosition', (position: any) => {
       setTruckPosition(position)
     })
+    socket.on('currentPath', (path: any) => {
+      console.log(path)
+      setTruckPosition(path)
+    })
     return () => {
       socket.off('connect')
       socket.off('disconnect')
       socket.off('truckPosition')
+      socket.off('currentPath')
     }
   }, [])
 
@@ -77,7 +83,7 @@ export const Map3D = (): JSX.Element => {
           maxPolarAngle={Math.PI / 4}
           position={[-12.5, 0, 0]}
         />
-
+        <Path path={currentPath} />
         <Robot position={truckPosition} />
         <Grid />
         {
@@ -139,14 +145,29 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
     </group>
 
   )
+}
+const Path = (props: { path: Coords[] }) => {
+  const coords = props.path.map((coords) => [coords.x, 1, coords.y])
+  console.log(props.path)
+  return (
+    <Line
+      points={[[-0.5, -0.5, 1 - 0.5], [-0.5, -0.5, 12 - 0.5], [-1 * (0.5 + 10), -0.5, 12 - 0.5]]}
+      color="red"
+      lineWidth={3}
+      dashed={false}
+      getObjectsByProperty={undefined}
+      forceSinglePass={undefined}
+      getVertexPosition={undefined}
 
+    />
+  )
 
 }
-const Robot = (props: { position: IPoint }) => {
+const Robot = (props: { position: Coords }) => {
   const [hovered, setHovered] = useState(false)
   return (
     <Cone
-      position={[-1 * (props.position.x - 0.5), 0, props.position.y - 0.5]}
+      position={[-1 * (props.position.x - 0.5), -0.4, props.position.y - 0.5]}
       onPointerOver={e => setHovered(true)}
       onPointerLeave={e => setHovered(false)}
       args={[0.5, 1, 2, 2]}

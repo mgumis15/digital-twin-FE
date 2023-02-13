@@ -1,199 +1,184 @@
-import React, { useEffect, useRef, useState } from "react"
-import robot from "../../../assets/images/robot.png"
-import packageImg from "../../../assets/images/package.png"
+import React, { useEffect, useState } from "react"
+import { Canvas } from '@react-three/fiber'
+import { Text, OrbitControls, Cone, RoundedBox, Line, Plane } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
-import { Point } from "../../../interfaces/Point.interface"
-import { Package, Shelf, Size } from "../../../interfaces/Map.interfaces"
+import { Coords } from "../../../interfaces/Coords.interface"
+import { Product } from "../../../interfaces/Product.interface"
+import { useLoadStore } from "../../../hooks/useLoadStore"
+import io from "socket.io-client"
+import { Shape } from "three"
+import { Modal } from "../../../components/Modal.component"
+import { ProductModal } from "../../../components/ProductModal.component"
 
-const robotSize = 40
-const robotImage = new Image()
-robotImage.src = robot
-const packageImage = new Image()
-packageImage.src = packageImg
+const socket = io("http://localhost:4001")
 
 export const Map2D = (): JSX.Element => {
-    const [isFetched, setIsFetched] = useState<Boolean>(false)
-    const [isError, setIsError] = useState<Boolean>(false)
-    const [size, setSize] = useState<Size>({ w: 0, h: 0 })
-    const [choosen, setChoosen] = useState<Package | null>(null)
-    const [overPackage, setOverPackage] = useState<Boolean>(false)
-    const [shelfs, setShelfs] = useState<Shelf[]>([])
-    const [packages, setPackages] = useState<Package[]>([])
+  const [isConnected, setIsConnected] = useState(socket.connected)
+  const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
+  const [openModal, setOpenModal] = useState<boolean>(false)
+  const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
+  const [currentPath, setcurrentPath] = useState<Coords[]>([])
 
-    function packageIntersection(packages: Package[], point: Point): Package | null {
-        for (let pack of packages) {
-            if (Math.abs(point.x - pack.position.x) <= 20 && Math.abs(point.y - pack.position.y) <= 20)
-                return pack
-        }
-        return null
-    }
+  const products = useLoadStore("http://localhost:4000/products")
 
-    function drawPoint(ctx: CanvasRenderingContext2D, point: Point, color: string) {
-        ctx.fillStyle = color
-        ctx.beginPath()
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI)
-        ctx.fill()
-        ctx.closePath()
-    }
 
-    function drawPath(ctx: CanvasRenderingContext2D, path: Point[]) {
-        ctx.strokeStyle = "#000000"
-        ctx.beginPath()
-        ctx.moveTo(path[0].x, path[0].y)
-        for (let i = 1; i < path.length; i++)
-            ctx.lineTo(path[i].x, path[i].y)
-        ctx.stroke()
-        ctx.closePath()
+  const openProductModal = (product: Product) => {
+    setChoosenProduct(product)
+    setOpenModal(true)
+  }
 
-        drawPoint(ctx, path[0], "#03fc98")
-        drawPoint(ctx, path[path.length - 1], "#fc0373")
-    }
-
-    function drawShelfs(ctx: CanvasRenderingContext2D, shelfs: Shelf[]) {
-        ctx.fillStyle = "#964B00"
-        for (let shelf of shelfs) {
-            if (shelf.shape === "rectangular") {
-                const { x, y } = shelf.startPoint
-                ctx.beginPath()
-                ctx.rect(x, y, shelf.width, shelf.height)
-                ctx.closePath()
-                ctx.fill()
-            }
-        }
-    }
-
-    function drawFrame(ctx: CanvasRenderingContext2D, shelf: Shelf) {
-        ctx.strokeStyle = "#03fc35"
-        const { x, y } = shelf.startPoint
-        ctx.beginPath()
-        ctx.rect(x, y, shelf.width, shelf.height)
-        ctx.closePath()
-        ctx.stroke()
-    }
-
-    function drawPackages(ctx: CanvasRenderingContext2D, packages: Package[]) {
-        for (let pack of packages) {
-            if (JSON.stringify(pack) === JSON.stringify(choosen)) {
-                let shelf: Shelf = {
-                    startPoint: { x: pack.position.x - robotSize / 2, y: pack.position.y - robotSize / 2 },
-                    shape: "rectangular",
-                    width: robotSize,
-                    height: robotSize
-                }
-                drawFrame(ctx, shelf)
-            }
-            ctx.drawImage(packageImage, pack.position.x - robotSize / 2, pack.position.y - robotSize / 2, robotSize, robotSize)
-        }
-    }
-
-    function drawRobot(ctx: CanvasRenderingContext2D, point: Point) {
-        ctx.drawImage(robotImage, point.x - robotSize / 2, point.y - robotSize / 2, robotSize, robotSize)
-    }
-
-    function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, path: Point[], shelfs: Shelf[], packages: Package[], i: number) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        if (path.length > 1)
-            drawPath(ctx, path)
-        drawShelfs(ctx, shelfs)
-        drawPackages(ctx, packages)
-        drawRobot(ctx, path[i])
-    }
-
-    function canvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const mousePos: Point = {
-                x: e.clientX - canvas.offsetLeft,
-                y: e.clientY - canvas.offsetTop
-            }
-            setChoosen(packageIntersection(packages, mousePos))
-        }
-    }
-
-    function canvasMove(e: React.MouseEvent<HTMLCanvasElement>) {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const mousePos: Point = {
-                x: e.clientX - canvas.offsetLeft,
-                y: e.clientY - canvas.offsetTop
-            }
-            if (packageIntersection(packages, mousePos))
-                setOverPackage(true)
-            else
-                setOverPackage(false)
-        }
-    }
-
-    let path: Point[] = []
-    path.push({ x: 50, y: 100 })
-    path.push({ x: 50, y: 200 })
-    path.push({ x: 250, y: 200 })
-    path.push({ x: 250, y: 300 })
-    path.push({ x: 500, y: 300 })
-    path.push({ x: 500, y: 400 })
-
-    const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    useEffect(() => {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
-            if (ctx)
-                update(canvas, ctx, path, shelfs, packages, Math.floor(Math.random() * path.length))
-        }
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log(`Connected ${socket.id}`)
+      setIsConnected(true)
     })
 
-    useEffect(() => {
-        loadUsers()
-    }, [])
-
-    const loadUsers = () => fetch("http://localhost:4000/store")
-        .then(res => res.json())
-        .then(
-            (result) => {
-                setTimeout(() => {
-                    setIsFetched(true)
-                    setSize(result.size)
-                    setPackages(result.packages)
-                    setShelfs(result.shelfs)
-                    return result
-                }, 500)
-            },
-            (error) => {
-                console.log(error.message)
-                setIsError(true)
-            }
-        )
-        .catch((error) => {
-            console.log(error.message)
-            setIsError(true)
-        })
-
-    function pickUpPackage() {
-        if (choosen) {
-            alert(`Robot picking package: x = ${choosen.position.x} y = ${choosen.position.y}`)
-            console.log("send request")
-        }
+    socket.on('disconnect', () => {
+      setIsConnected(false)
+    })
+    socket.on('truckPosition', (position: any) => {
+      setTruckPosition(position)
+    })
+    socket.on('currentPath', (path: any) => {
+      console.log(path)
+      setTruckPosition(path)
+    })
+    return () => {
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('truckPosition')
+      socket.off('currentPath')
     }
+  }, [])
 
-    return (
-        <div className="flex justify-around flex-wrap mt-10 px-10 gap-10">
-            {isFetched ?
-                <>
-                    <canvas className="border-2 border-solid border-black" style={{ cursor: overPackage ? "pointer" : "auto" }} width={size.w} height={size.h} ref={canvasRef} onMouseDown={canvasClick} onMouseMove={canvasMove}></canvas>
-                    <div className="flex-1 justify-center items-center">
-                        <>
-                            {choosen === null ?
-                                <div className="flex justify-center items-center">NO SELECTED PRODUCT</div>
-                                :
-                                <div className="flex flex-col">
-                                    <div className="">x: {choosen.position.x}</div>
-                                    <div className="">y: {choosen.position.y}</div>
-                                    <button className="w-1/2 bg-gray-600" onClick={pickUpPackage}>TAKE</button>
-                                </div>
-                            }
-                        </>
-                    </div>
-                </> : isError ? <div>Error occured</div> : <ActivityIndicator />}
+  return (
+    <div className="bg-slate-900 h-screen overflow-hidden">
+      <Modal.Frame open={openModal} onClose={() => {
+        setChoosenProduct(null)
+        setOpenModal(prevOpenModal => !prevOpenModal)
+      }}>
+        <Modal.Body>
+          {
+            choosenProduct ?
+              (
+                <ProductModal product={choosenProduct} />
+              ) : ''
+          }
+        </Modal.Body>
+      </Modal.Frame>
+      <Canvas camera={{ fov: 45, position: [-12.5, 15, -12.5] }}>
+        <pointLight color={"#fff"} position={[0, 7, 0]} intensity={0.7} />
+        <pointLight color={"#fff"} position={[0, 7, 25]} intensity={0.5} />
+        <pointLight color={"#fff"} position={[-25, 7, 0]} intensity={0.5} />
+        <pointLight color={"#fff"} position={[-25, 7, 25]} intensity={0.7} />
+        <OrbitControls
+          zoomSpeed={1}
+          target={[-12.5, 15, 12.5]}
+          minZoom={80}
+          maxZoom={80}
+          enablePan={true}
+          maxDistance={50}
+          dampingFactor={0.05}
+          minPolarAngle={0}
+          maxPolarAngle={0}
+          position={[-12.5, 15, 12.5]}
+        />
+        <Path path={currentPath} />
+        <Robot position={truckPosition} />
+        <Grid />
+        {
+          products.data
+            .map((product: Product, i) => {
+              return <ProductBox product={product} handleClick={() => openProductModal(product)} key={product.id} />
+            })
+        }
+      </Canvas>
+      {products.loading &&
+        <div className="left-0 top-0 z-10 bg-black bg-opacity-80 fixed w-full h-full">
+          <div className="relative top-1/2 scale-150">
+            <ActivityIndicator />
+          </div>
         </div>
-    )
+      }
+      {products.error && <h1>Error</h1>}
+    </div>
+  )
 }
+const ProductBox = (props: { product: Product, handleClick: Function }) => {
+  const [hovered, setHovered] = useState(false)
+
+  const product: Product = props.product
+
+  return (
+    <group key={"Product " + product.id} position={[-1 * (product.localization.x - 0.5), -1, product.localization.y - 0.5]}>
+      <Text
+        fontSize={0.3}
+        rotation={[Math.PI / 2, Math.PI, 0]}
+        position={[0, 0.02, 0]}
+        color="black"
+        anchorX="center"
+        anchorY="middle"
+        children={product.id}
+        getObjectsByProperty={undefined}
+        getVertexPosition={undefined} />
+
+      <Plane
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.95, 1, 0.95]}
+
+        onPointerOver={e => {
+          e.stopPropagation()
+          setHovered(true)
+        }}
+        onPointerLeave={e => {
+          e.stopPropagation()
+          setHovered(false)
+        }}
+        onPointerDown={e => {
+          e.stopPropagation()
+          props.handleClick()
+        }}
+
+        getObjectsByProperty={undefined} getVertexPosition={undefined}    >
+
+        <meshPhongMaterial color={hovered ? "#e69a3d" : "#eab676"} />
+      </Plane>
+    </group>
+
+  )
+}
+const Path = (props: { path: Coords[] }) => {
+  const coords = props.path.map((coords) => [coords.x, 1, coords.y])
+  console.log(props.path)
+  return (
+    <Line
+      points={[[-0.5, -1, 1 - 0.5], [-0.5, -1, 12 - 0.5], [-1 * (0.5 + 10), -1, 12 - 0.5]]}
+      color="red"
+      lineWidth={3}
+      dashed={false}
+      getObjectsByProperty={undefined}
+      forceSinglePass={undefined}
+      getVertexPosition={undefined}
+
+    />
+  )
+
+}
+const Robot = (props: { position: Coords }) => {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <Cone
+      position={[-1 * (props.position.x - 0.5), -0.95, props.position.y - 0.5]}
+      onPointerOver={e => setHovered(true)}
+      onPointerLeave={e => setHovered(false)}
+      args={[0.5, 1, 2, 2]}
+      rotation={[Math.PI / 2, Math.PI / 2, 0]} getObjectsByProperty={undefined} getVertexPosition={undefined}>
+      <meshBasicMaterial color={hovered ? "#7dfcf6" : "#0ea5e9"} />
+    </Cone>
+
+  )
+}
+const Grid = ({ size = 25 }) => (
+  <gridHelper args={[size, size, '#bbb', '#bbb']} position={[-12.5, -1, 12.5]} />
+
+)

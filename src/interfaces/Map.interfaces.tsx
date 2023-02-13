@@ -1,10 +1,10 @@
-import { Point } from "../interfaces/Point.interface"
+import { Coords } from "./Coords.interface"
 interface Package {
-    position: Point
+    position: Coords
 }
 
 interface Shelf {
-    startPoint: Point,
+    startCords: Coords,
     shape: String,
     width: number,
     height: number

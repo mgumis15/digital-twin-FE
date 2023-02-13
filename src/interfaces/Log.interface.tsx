@@ -1,9 +1,9 @@
-import { Point } from "./Point.interface"
+import { Coords } from "./Coords.interface"
 export interface Log {
     id: number,
     product_id: number,
     type: LogType,
-    localization: Point,
+    localization: Coords,
     created_at: string,
     interfaceType: "Log"
 
