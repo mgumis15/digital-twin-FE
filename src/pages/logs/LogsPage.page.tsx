@@ -6,25 +6,31 @@ import { Modal } from "../../components/Modal.component"
 import { Log } from "../../interfaces/Log.interface"
 import { LogModal } from "../../components/LogModal.component"
 import { LogLi } from "../../components/LogLi.component"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { getPaginatedLogs } from "../../func/databaseConnectors.axios"
 
 export const LogsPage = (): JSX.Element => {
     const ref = useRef(null)
     const [searchInput, setSearchInput] = useState<string>("")
-    const [pageNumber, setPageNumber] = useState<number>(1)
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [choosenLog, setChoosenLog] = useState<Log | null>(null)
     const observer = useRef<HTMLDivElement>(null) as any
 
     const handleSearch = (e: string) => {
         setSearchInput(e)
-        setPageNumber(1)
     }
+
     const {
-        loading,
         error,
-        items,
-        hasMore
-    } = useItemsSearch("http://localhost:4000/logs?", searchInput, pageNumber)
+        data,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage
+    } = useInfiniteQuery({
+        queryKey: ["logs", "infinite", { query: searchInput }],
+        queryFn: ({ pageParam = 1 }) => getPaginatedLogs(pageParam, searchInput),
+        getNextPageParam: prevData => prevData?.nextPage
+    })
 
     const openLogModal = (log: Log) => {
         setChoosenLog(log)
@@ -32,15 +38,15 @@ export const LogsPage = (): JSX.Element => {
     }
 
     const lastItemElementRef = useCallback((node: any) => {
-        if (loading) return
+        if (isFetchingNextPage) return
         if (observer.current) observer.current.disconnect()
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setPageNumber(prevPageNumber => prevPageNumber + 1)
+            if (entries[0].isIntersecting && hasNextPage) {
+                fetchNextPage()
             }
         })
         if (node) observer.current.observe(node)
-    }, [loading, hasMore])
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
     return (
         <div ref={ref} className="w-full flex justify-center ">
@@ -61,19 +67,20 @@ export const LogsPage = (): JSX.Element => {
                 <h1 className="space-y-2 p-2 text-center text-3xl">Logs </h1>
                 <Search searchInput={searchInput} handler={handleSearch} />
                 {
-                    items
-                        .map((log, i) => {
-                            if (i + 1 === items.length)
+                    data?.pages
+                        .map((logsPages, j, pages) => logsPages.data.map((log, i, logs) => {
+                            if (i + 1 === logs.length && j + 1 === pages.length)
                                 return <LogLi ref={lastItemElementRef} key={i}
                                     log={log}
                                     handleClick={() => openLogModal(log)} />
                             else
                                 return <LogLi key={i} log={log}
                                     handleClick={() => openLogModal(log)} />
-                        })
+                        }))
+
                 }
-                {loading && <ActivityIndicator />}
-                {error && <h1>Error</h1>}
+                {isFetchingNextPage && <ActivityIndicator />}
+                {error ? <h1>Error</h1> : ""}
             </div>
         </div>
     )
