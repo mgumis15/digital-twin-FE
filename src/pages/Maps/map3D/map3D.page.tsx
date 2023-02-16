@@ -9,6 +9,8 @@ import io from "socket.io-client"
 import { Shape } from "three"
 import { Modal } from "../../../components/Modal.component"
 import { ProductModal } from "../../../components/ProductModal.component"
+import { getProducts } from "../../../func/databaseConnectors.axios"
+import { useQuery } from "@tanstack/react-query"
 
 const socket = io("http://localhost:4001")
 
@@ -19,8 +21,10 @@ export const Map3D = (): JSX.Element => {
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
   const [currentPath, setcurrentPath] = useState<Coords[]>([])
 
-  const products = useLoadStore("http://localhost:4000/products")
-
+  const productsQuery = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts
+  })
 
   const openProductModal = (product: Product) => {
     setChoosenProduct(product)
@@ -87,20 +91,20 @@ export const Map3D = (): JSX.Element => {
         <Robot position={truckPosition} />
         <Grid />
         {
-          products.data
+          productsQuery.data?.products
             .map((product: Product, i) => {
               return <ProductBox product={product} handleClick={() => openProductModal(product)} key={product.id} />
             })
         }
       </Canvas>
-      {products.loading &&
+      {productsQuery.isLoading &&
         <div className="left-0 top-0 z-10 bg-black bg-opacity-80 fixed w-full h-full">
           <div className="relative top-1/2 scale-150">
             <ActivityIndicator />
           </div>
         </div>
       }
-      {products.error && <h1>Error</h1>}
+      {productsQuery.isError && <h1>Error</h1>}
     </div>
   )
 }

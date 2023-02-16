@@ -1,13 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Product } from '../interfaces/Product.interface'
 import { NamedLabel } from './NamedLabel.component'
 import { TruckIcon } from './TruckIcon.component'
+import { Task } from '../interfaces/Task.interface'
 
 
 export const ProductModal = (props: { product: Product }) => {
   const product: Product = props.product
-
+  const [task, setTask] = useState<Task | null>(null)
+  const createTask = (type: "Destroy" | "Fetch" | "Check") => {
+    setTask({
+      id: null,
+      product_id: props.product.id,
+      type: type,
+      localization: props.product.localization
+    })
+  }
   const moveToMap = () => {
     console.log("Move to map")
   }
@@ -34,9 +43,9 @@ export const ProductModal = (props: { product: Product }) => {
       <div className=" rounded my-4 h-[1px] bg-gray-100 w-11/12" />
 
       <div className='w-9/12 text-red-600 font-bold flex justify-between'>
-        <TruckIcon type="Destroy" handler={() => { console.log("Destroy") }}></TruckIcon>
-        <TruckIcon type="Fetch" handler={() => { console.log("Fetch") }}></TruckIcon>
-        <TruckIcon type="Check" handler={() => { console.log("Check") }}></TruckIcon>
+        <TruckIcon type="Destroy" setTask={() => { createTask("Destroy") }} task={task} />
+        <TruckIcon type="Fetch" setTask={() => { createTask("Fetch") }} task={task} />
+        <TruckIcon type="Check" setTask={() => { createTask("Check") }} task={task} />
       </div>
     </div>
   )

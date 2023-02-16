@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from "react"
 import { Search } from "../../components/Search.component"
 import { ActivityIndicator } from "../../components/ActivityIndicator.component"
-import { useItemsSearch } from "../../hooks/useItemsSearch.hook"
 import { Modal } from "../../components/Modal.component"
 import { Log } from "../../interfaces/Log.interface"
 import { LogModal } from "../../components/LogModal.component"
