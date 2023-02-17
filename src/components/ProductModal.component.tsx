@@ -4,19 +4,14 @@ import { Product } from '../interfaces/Product.interface'
 import { NamedLabel } from './NamedLabel.component'
 import { TruckIcon } from './TruckIcon.component'
 import { Task } from '../interfaces/Task.interface'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { sendTask } from '../func/databaseConnectors.axios'
 
 
-export const ProductModal = (props: { product: Product }) => {
+export const ProductModal = (props: { product: Product, task: Task | null }) => {
   const product: Product = props.product
-  const [task, setTask] = useState<Task | null>(null)
-  const createTask = (type: "Destroy" | "Fetch" | "Check") => {
-    setTask({
-      id: null,
-      product_id: props.product.id,
-      type: type,
-      localization: props.product.localization
-    })
-  }
+  const task: Task | null = props.task
+
   const moveToMap = () => {
     console.log("Move to map")
   }
@@ -43,9 +38,9 @@ export const ProductModal = (props: { product: Product }) => {
       <div className=" rounded my-4 h-[1px] bg-gray-100 w-11/12" />
 
       <div className='w-9/12 text-red-600 font-bold flex justify-between'>
-        <TruckIcon type="Destroy" setTask={() => { createTask("Destroy") }} task={task} />
-        <TruckIcon type="Fetch" setTask={() => { createTask("Fetch") }} task={task} />
-        <TruckIcon type="Check" setTask={() => { createTask("Check") }} task={task} />
+        <TruckIcon type="Destroy" product={product} task={task} />
+        <TruckIcon type="Fetch" product={product} task={task} />
+        <TruckIcon type="Check" product={product} task={task} />
       </div>
     </div>
   )

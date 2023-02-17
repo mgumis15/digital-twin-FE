@@ -9,8 +9,9 @@ import io from "socket.io-client"
 import { Shape } from "three"
 import { Modal } from "../../../components/Modal.component"
 import { ProductModal } from "../../../components/ProductModal.component"
-import { getProducts } from "../../../func/databaseConnectors.axios"
+import { getProducts, getTasks } from "../../../func/databaseConnectors.axios"
 import { useQuery } from "@tanstack/react-query"
+import { Task } from "../../../interfaces/Task.interface"
 
 const socket = io("http://localhost:4001")
 
@@ -19,6 +20,7 @@ export const Map3D = (): JSX.Element => {
   const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
+  const [choosenProductTask, setChoosenProductTask] = useState<Task | null>(null)
   const [currentPath, setcurrentPath] = useState<Coords[]>([])
 
   const productsQuery = useQuery({
@@ -26,14 +28,34 @@ export const Map3D = (): JSX.Element => {
     queryFn: getProducts
   })
 
+  const {
+    data: tasks
+  } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: () => getTasks()
+  })
+
   const openProductModal = (product: Product) => {
+    let task = tasks?.tasks?.find(task => task.task.product_id === product.id)
+    if (task)
+      setChoosenProductTask(task.task)
+    else
+      setChoosenProductTask(null)
     setChoosenProduct(product)
     setOpenModal(true)
   }
+  useEffect(() => {
+    if (choosenProduct) {
+      let task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
+      if (task)
+        setChoosenProductTask(task.task)
+      else
+        setChoosenProductTask(null)
+    }
+  }, [choosenProduct, tasks])
 
   useEffect(() => {
     socket.on('connect', () => {
-      console.log(`Connected ${socket.id}`)
       setIsConnected(true)
     })
 
@@ -65,7 +87,7 @@ export const Map3D = (): JSX.Element => {
           {
             choosenProduct ?
               (
-                <ProductModal product={choosenProduct} />
+                <ProductModal product={choosenProduct} task={choosenProductTask} />
               ) : ''
           }
         </Modal.Body>

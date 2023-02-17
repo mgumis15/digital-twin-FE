@@ -1,23 +1,23 @@
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { ProductLi } from "../../components/ProductLi.component"
 import { Search } from "../../components/Search.component"
 import { ActivityIndicator } from "../../components/ActivityIndicator.component"
 import { Modal } from "../../components/Modal.component"
 import { Product } from "../../interfaces/Product.interface"
 import { ProductModal } from "../../components/ProductModal.component"
-import { useInfiniteQuery } from "@tanstack/react-query"
-import { getPaginatedProducts } from "../../func/databaseConnectors.axios"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import { getPaginatedProducts, getTasks } from "../../func/databaseConnectors.axios"
+import { Task } from "../../interfaces/Task.interface"
 export const StorePage = (): JSX.Element => {
     const ref = useRef(null)
     const [searchInput, setSearchInput] = useState<string>("")
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
+    const [choosenProductTask, setChoosenProductTask] = useState<Task | null>(null)
     const observer = useRef<HTMLDivElement>(null) as any
-
     const {
-        status,
         error,
-        data,
+        data: dataProducts,
         isFetchingNextPage,
         hasNextPage,
         fetchNextPage
@@ -27,8 +27,29 @@ export const StorePage = (): JSX.Element => {
         getNextPageParam: prevData => prevData?.nextPage
     })
 
+    const {
+        data: tasks
+    } = useQuery({
+        queryKey: ["tasks"],
+        queryFn: () => getTasks()
+    })
+
+    useEffect(() => {
+        if (choosenProduct) {
+            let task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
+            if (task)
+                setChoosenProductTask(task.task)
+            else
+                setChoosenProductTask(null)
+        }
+    }, [choosenProduct, tasks])
 
     const openProductModal = (product: Product) => {
+        let task = tasks?.tasks?.find(task => task.task.product_id === product.id)
+        if (task)
+            setChoosenProductTask(task.task)
+        else
+            setChoosenProductTask(null)
         setChoosenProduct(product)
         setOpenModal(true)
     }
@@ -55,7 +76,7 @@ export const StorePage = (): JSX.Element => {
                     {
                         choosenProduct ?
                             (
-                                <ProductModal product={choosenProduct} />
+                                <ProductModal product={choosenProduct} task={choosenProductTask} />
                             ) : ''
                     }
                 </Modal.Body>
@@ -64,15 +85,22 @@ export const StorePage = (): JSX.Element => {
                 <h1 className="space-y-2 p-2 text-center text-3xl">Products </h1>
                 <Search searchInput={searchInput} handler={(e: string) => setSearchInput(e)} />
                 {
-                    data?.pages
+                    dataProducts?.pages
                         .map((porductsPage, j, pages) => porductsPage.products.map((product, i, products) => {
+                            let task = tasks?.tasks?.find(task => task.task.product_id === product.id)?.task
+
                             if (i + 1 === products.length && j + 1 === pages.length)
+
                                 return <ProductLi ref={lastItemElementRef} key={i}
                                     product={product}
-                                    handleClick={() => openProductModal(product)} />
+                                    handleClick={() => openProductModal(product)}
+                                    task={task ? task : null}
+                                />
                             else
                                 return <ProductLi key={i} product={product}
-                                    handleClick={() => openProductModal(product)} />
+                                    handleClick={() => openProductModal(product)}
+                                    task={task ? task : null}
+                                />
                         }))
 
                 }
