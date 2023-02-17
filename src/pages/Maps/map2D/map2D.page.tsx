@@ -20,7 +20,7 @@ export const Map2D = (): JSX.Element => {
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
   const [choosenProductTask, setChoosenProductTask] = useState<Task | null>(null)
 
-  const [currentPath, setcurrentPath] = useState<Coords[]>([])
+  const [currentPath, setcurrentPath] = useState<Coords[]>([truckPosition])
 
   const productsQuery = useQuery({
     queryKey: ["products"],
@@ -61,12 +61,21 @@ export const Map2D = (): JSX.Element => {
 
     socket.on('disconnect', () => {
     })
-    socket.on('truckPosition', (position: any) => {
+
+    socket.on('truckPosition', (pos: any) => {
+      let position = pos as Coords
       setTruckPosition(position)
+      console.log(currentPath)
+      if (position.x === currentPath[currentPath.length - 1].x && position.y === currentPath[currentPath.length - 1].y)
+        console.log("END")
+
     })
+
     socket.on('currentPath', (path: any) => {
-      setTruckPosition(path)
+      let pathCoords = path as Coords[]
+      setcurrentPath(pathCoords)
     })
+
     return () => {
       socket.off('connect')
       socket.off('disconnect')
@@ -172,10 +181,10 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
   )
 }
 const Path = (props: { path: Coords[] }) => {
-  const coords = props.path.map((coords) => [coords.x, 1, coords.y])
+  const coords = props.path.map((coords) => [-1 * (coords.x - 0.5), -1, (coords.y - 0.5)])
   return (
     <Line
-      points={[[-0.5, -1, 1 - 0.5], [-0.5, -1, 12 - 0.5], [-1 * (0.5 + 10), -1, 12 - 0.5]]}
+      points={coords.flatMap(d => d)}
       color="red"
       lineWidth={3}
       dashed={false}
