@@ -10,18 +10,21 @@ import { Shape } from "three"
 import { Modal } from "../../../components/Modal.component"
 import { ProductModal } from "../../../components/ProductModal.component"
 import { getProducts, getTasks } from "../../../func/databaseConnectors.axios"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Task } from "../../../interfaces/Task.interface"
 
 const socket = io("http://localhost:4001")
 
 export const Map3D = (): JSX.Element => {
   const [isConnected, setIsConnected] = useState(socket.connected)
-  const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
+
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
   const [choosenProductTask, setChoosenProductTask] = useState<Task | null>(null)
-  const [currentPath, setcurrentPath] = useState<Coords[]>([])
+  const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
+  const [truckRotation, setTruckRotation] = useState<[number, number, number]>([Math.PI / 2, Math.PI / 2, 0])
+  const [currentPath, setCurrentPath] = useState<Coords[]>([{ x: 1, y: 1 }])
+  const queryClient = useQueryClient()
 
   const productsQuery = useQuery({
     queryKey: ["products"],
@@ -62,12 +65,26 @@ export const Map3D = (): JSX.Element => {
     socket.on('disconnect', () => {
       setIsConnected(false)
     })
-    socket.on('truckPosition', (position: any) => {
-      setTruckPosition(position)
+    socket.on('truckPosition', (pos: any) => {
+      let position = pos as Coords
+
+      setTruckPosition(prevPos => {
+        if (prevPos.x !== position.x) {
+          setTruckRotation([0, 0, Math.PI / 2 * (position.x - prevPos.x)])
+        }
+        if (prevPos.y !== position.y) {
+          setTruckRotation([Math.PI / 2 * (position.y - prevPos.y), Math.PI / 2, 0])
+        }
+        return position
+      })
     })
     socket.on('currentPath', (path: any) => {
-      console.log(path)
-      setTruckPosition(path)
+      let pathCoords = path as Coords[]
+      if (pathCoords.length === 0) {
+        queryClient.invalidateQueries(["tasks"], { exact: true })
+        setCurrentPath([{ x: 1, y: 1 }])
+      } else
+        setCurrentPath(pathCoords)
     })
     return () => {
       socket.off('connect')
@@ -110,7 +127,8 @@ export const Map3D = (): JSX.Element => {
           position={[-12.5, 0, 0]}
         />
         <Path path={currentPath} />
-        <Robot position={truckPosition} />
+
+        <Robot position={truckPosition} rotation={truckRotation} />
         <Grid />
         {
           productsQuery.data?.products
@@ -161,7 +179,8 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
         }}
         onPointerDown={e => {
           e.stopPropagation()
-          props.handleClick()
+          if (e.button === 0)
+            props.handleClick()
         }}
 
         getObjectsByProperty={undefined} getVertexPosition={undefined}    >
@@ -173,11 +192,10 @@ const ProductBox = (props: { product: Product, handleClick: Function }) => {
   )
 }
 const Path = (props: { path: Coords[] }) => {
-  const coords = props.path.map((coords) => [coords.x, 1, coords.y])
-  console.log(props.path)
+  const coords = props.path.map((coords) => [-1 * (coords.x - 0.5), -0.3, (coords.y - 0.5)])
   return (
     <Line
-      points={[[-0.5, -0.5, 1 - 0.5], [-0.5, -0.5, 12 - 0.5], [-1 * (0.5 + 10), -0.5, 12 - 0.5]]}
+      points={coords.flatMap(d => d)}
       color="red"
       lineWidth={3}
       dashed={false}
@@ -189,15 +207,15 @@ const Path = (props: { path: Coords[] }) => {
   )
 
 }
-const Robot = (props: { position: Coords }) => {
+const Robot = (props: { position: Coords, rotation: [number, number, number] }) => {
   const [hovered, setHovered] = useState(false)
   return (
     <Cone
-      position={[-1 * (props.position.x - 0.5), -0.4, props.position.y - 0.5]}
+      position={[-1 * (props.position.x - 0.5), -0.2, props.position.y - 0.5]}
       onPointerOver={e => setHovered(true)}
       onPointerLeave={e => setHovered(false)}
       args={[0.5, 1, 2, 2]}
-      rotation={[Math.PI / 2, Math.PI / 2, 0]} getObjectsByProperty={undefined} getVertexPosition={undefined}>
+      rotation={props.rotation} getObjectsByProperty={undefined} getVertexPosition={undefined}>
       <meshBasicMaterial color={hovered ? "#7dfcf6" : "#0ea5e9"} />
     </Cone>
 

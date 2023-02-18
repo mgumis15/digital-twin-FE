@@ -85,13 +85,18 @@ export const TruckIcon = (props: { type: "Destroy" | "Fetch" | "Check", product:
             onClick={(e) => {
                 e.stopPropagation()
                 if (cancellable) {
-                    if (props.task)
-                        removeTaskMutate(props.task.id)
+                    if (props.task) {
+                        if (window.confirm('Are you sure you wish to delete this task?')) {
+                            removeTaskMutate(props.task.id
+                            )
+                        }
+                    }
                 }
                 else
                     createTask()
 
-            }}
+            }
+            }
             disabled={active ? false : true}>
             <TruckSolid className=" fill-sky-400 cursor-pointer shadow-xltransition-colors h-8" />
             {

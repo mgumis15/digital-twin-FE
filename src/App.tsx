@@ -6,7 +6,11 @@ import { HomePage } from './pages/home/HomePage.page'
 import { Navbar } from './components/Navbar.component'
 import { PageNotFound } from './pages/error/pageNotFound.page'
 import { Routes, Route } from 'react-router-dom'
+import { FloatingButton } from './components/FloatingButton.component'
+import { FloatingMenu } from './components/FloatingMenu.component'
+import { useState } from 'react'
 function App() {
+  const [openTaskMenu, setOpenTaskMenu] = useState<boolean>(false)
   return (
     <>
       <div className="App dark">
@@ -19,6 +23,9 @@ function App() {
           <Route path='/logs' element={<LogsPage />} />
           <Route path='*' element={<PageNotFound />} />
         </Routes>
+        <FloatingMenu open={openTaskMenu} />
+        <FloatingButton handler={() => setOpenTaskMenu(prev => !prev)} />
+
       </div>
     </>
   )
