@@ -4,9 +4,7 @@ import { Text, OrbitControls, Cone, RoundedBox, Line } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
 import { Coords } from "../../../interfaces/Coords.interface"
 import { Product } from "../../../interfaces/Product.interface"
-import { useLoadStore } from "../../../hooks/useLoadStore"
 import io from "socket.io-client"
-import { Shape } from "three"
 import { Modal } from "../../../components/Modal.component"
 import { ProductModal } from "../../../components/ProductModal.component"
 import { getProducts, getTasks } from "../../../func/databaseConnectors.axios"
@@ -16,8 +14,6 @@ import { Task } from "../../../interfaces/Task.interface"
 const socket = io("http://localhost:4001")
 
 export const Map3D = (): JSX.Element => {
-  const [isConnected, setIsConnected] = useState(socket.connected)
-
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [choosenProduct, setChoosenProduct] = useState<Product | null>(null)
   const [choosenProductTask, setChoosenProductTask] = useState<Task | null>(null)
@@ -59,11 +55,11 @@ export const Map3D = (): JSX.Element => {
 
   useEffect(() => {
     socket.on('connect', () => {
-      setIsConnected(true)
+      console.log("Connected to socket server")
     })
-
     socket.on('disconnect', () => {
-      setIsConnected(false)
+      console.log("Disconnected from socket server")
+
     })
     socket.on('truckPosition', (pos: any) => {
       let position = pos as Coords
@@ -92,7 +88,7 @@ export const Map3D = (): JSX.Element => {
       socket.off('truckPosition')
       socket.off('currentPath')
     }
-  }, [])
+  }, [queryClient])
 
   return (
     <div className="bg-slate-900 h-screen overflow-hidden">

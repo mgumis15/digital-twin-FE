@@ -1,9 +1,11 @@
 import React, { forwardRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { Log, LogType } from "../interfaces/Log.interface"
 import { NamedLabel } from "./NamedLabel.component"
 export const LogLi = forwardRef((props: { log: Log, handleClick: Function }, ref: React.Ref<HTMLDivElement>) => {
+    const navigate = useNavigate()
     const moveToMap = () => {
-        console.log("Move to map")
+        navigate("/maps/map2D")
     }
     const log: Log = props.log
     const handleClick: Function = props.handleClick

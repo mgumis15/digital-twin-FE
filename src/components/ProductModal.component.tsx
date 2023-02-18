@@ -1,19 +1,19 @@
-import React, { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Product } from '../interfaces/Product.interface'
 import { NamedLabel } from './NamedLabel.component'
 import { TruckIcon } from './TruckIcon.component'
 import { Task } from '../interfaces/Task.interface'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { sendTask } from '../func/databaseConnectors.axios'
+import { useNavigate } from 'react-router-dom'
+
 
 
 export const ProductModal = (props: { product: Product, task: Task | null }) => {
   const product: Product = props.product
   const task: Task | null = props.task
-
+  const navigate = useNavigate()
   const moveToMap = () => {
-    console.log("Move to map")
+    navigate("/maps/map2D")
+
   }
 
   return (

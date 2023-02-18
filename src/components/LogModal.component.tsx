@@ -1,13 +1,14 @@
+import { useNavigate } from 'react-router-dom'
 import { Log, LogType } from '../interfaces/Log.interface'
 import { NamedLabel } from './NamedLabel.component'
 
 
 export const LogModal = (props: { log: Log }) => {
-
+  const navigate = useNavigate()
   const log: Log = props.log
 
   const moveToMap = () => {
-    console.log("Move to map")
+    navigate("/maps/map2D")
   }
 
 

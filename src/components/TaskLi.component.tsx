@@ -9,7 +9,7 @@ import { removeTask } from "../func/databaseConnectors.axios"
 export const TaskLi = (props: { task: Task }) => {
     const queryClient = useQueryClient()
 
-    const { status: removeStatus, error: removeError, mutate: removeTaskMutate } = useMutation({
+    const { status: removeStatus, mutate: removeTaskMutate } = useMutation({
         mutationFn: removeTask,
         onSuccess: newTask => {
             queryClient.invalidateQueries(["tasks"], { exact: true })
@@ -46,7 +46,9 @@ export const TaskLi = (props: { task: Task }) => {
                     removeTaskMutate(props.task.id
                     )
                 }
-            }}>
+            }}
+                disabled={removeStatus === "loading" ? true : false}
+            >
                 <RemoveSolid className="bg-opacity-0 scale-75 fill-red-700 transition-colors h-8" title="Check" />
             </button>
         </div>

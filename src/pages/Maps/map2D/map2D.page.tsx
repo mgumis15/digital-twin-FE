@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { Canvas } from '@react-three/fiber'
-import { Text, OrbitControls, Cone, RoundedBox, Line, Plane } from "@react-three/drei"
+import { Text, OrbitControls, Cone, Line, Plane } from "@react-three/drei"
 import { ActivityIndicator } from "../../../components/ActivityIndicator.component"
 import { Coords } from "../../../interfaces/Coords.interface"
 import { Product } from "../../../interfaces/Product.interface"
-import { useLoadStore } from "../../../hooks/useLoadStore"
 import io from "socket.io-client"
 import { Modal } from "../../../components/Modal.component"
 import { ProductModal } from "../../../components/ProductModal.component"
@@ -91,7 +90,7 @@ export const Map2D = (): JSX.Element => {
       socket.off('truckPosition')
       socket.off('currentPath')
     }
-  }, [])
+  }, [queryClient])
 
 
   return (

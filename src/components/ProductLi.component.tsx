@@ -1,6 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import React, { forwardRef, useState } from "react"
-import { sendTask } from "../func/databaseConnectors.axios"
+import React, { forwardRef } from "react"
 import { Product } from "../interfaces/Product.interface"
 import { Task } from "../interfaces/Task.interface"
 import { NamedLabel } from "./NamedLabel.component"

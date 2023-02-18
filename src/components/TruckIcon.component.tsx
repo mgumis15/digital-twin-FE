@@ -16,19 +16,24 @@ export const TruckIcon = (props: { type: "Destroy" | "Fetch" | "Check", product:
     const [cancellable, setCancellable] = useState<boolean>(false)
     const queryClient = useQueryClient()
 
-    const { status: addStatus, error: addError, mutate: addTaskMutate } = useMutation({
+    const { mutate: addTaskMutate } = useMutation({
         mutationFn: sendTask,
+        onMutate: () => {
+            setActive(false)
+        },
         onSuccess: newTask => {
             queryClient.invalidateQueries(["tasks"], { exact: true })
         },
         onError: err => {
             console.log(err)
         }
-
     })
 
-    const { status: removeStatus, error: removeError, mutate: removeTaskMutate } = useMutation({
+    const { mutate: removeTaskMutate } = useMutation({
         mutationFn: removeTask,
+        onMutate: () => {
+            setActive(false)
+        },
         onSuccess: newTask => {
             queryClient.invalidateQueries(["tasks"], { exact: true })
         },
