@@ -36,7 +36,7 @@ export const StorePage = (): JSX.Element => {
 
     useEffect(() => {
         if (choosenProduct) {
-            let task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
+            const task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
             if (task)
                 setChoosenProductTask(task.task)
             else
@@ -45,7 +45,7 @@ export const StorePage = (): JSX.Element => {
     }, [choosenProduct, tasks])
 
     const openProductModal = (product: Product) => {
-        let task = tasks?.tasks?.find(task => task.task.product_id === product.id)
+        const task = tasks?.tasks?.find(task => task.task.product_id === product.id)
         if (task)
             setChoosenProductTask(task.task)
         else
@@ -64,7 +64,7 @@ export const StorePage = (): JSX.Element => {
         })
         if (node) observer.current.observe(node)
 
-    }, [hasNextPage, isFetchingNextPage])
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
     return (
         <div ref={ref} className="w-full flex justify-center">
@@ -87,7 +87,7 @@ export const StorePage = (): JSX.Element => {
                 {
                     dataProducts?.pages
                         .map((porductsPage, j, pages) => porductsPage.products.map((product, i, products) => {
-                            let task = tasks?.tasks?.find(task => task.task.product_id === product.id)?.task
+                            const task = tasks?.tasks?.find(task => task.task.product_id === product.id)?.task
 
                             if (i + 1 === products.length && j + 1 === pages.length)
 

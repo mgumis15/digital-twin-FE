@@ -11,7 +11,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getProducts, getTasks } from "../../../func/databaseConnectors.axios"
 import { Task } from "../../../interfaces/Task.interface"
 
-const socket = io("http://localhost:4001")
+const socket = io("http://localhost:3000")
 
 export const Map2D = (): JSX.Element => {
   const [truckPosition, setTruckPosition] = useState<Coords>({ x: 1, y: 1 })
@@ -34,7 +34,7 @@ export const Map2D = (): JSX.Element => {
   })
 
   const openProductModal = (product: Product) => {
-    let task = tasks?.tasks?.find(task => task.task.product_id === product.id)
+    const task = tasks?.tasks?.find(task => task.task.product_id === product.id)
     if (task)
       setChoosenProductTask(task.task)
     else
@@ -45,7 +45,7 @@ export const Map2D = (): JSX.Element => {
 
   useEffect(() => {
     if (choosenProduct) {
-      let task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
+      const task = tasks?.tasks?.find(task => task.task.product_id === choosenProduct.id)
       if (task)
         setChoosenProductTask(task.task)
       else
@@ -62,8 +62,7 @@ export const Map2D = (): JSX.Element => {
     })
 
     socket.on('truckPosition', (pos: any) => {
-      let position = pos as Coords
-
+      const position = pos as Coords
       setTruckPosition(prevPos => {
         if (prevPos.x !== position.x) {
           setTruckRotation([0, 0, Math.PI / 2 * (position.x - prevPos.x)])
@@ -76,7 +75,7 @@ export const Map2D = (): JSX.Element => {
     })
 
     socket.on('currentPath', (path: any) => {
-      let pathCoords = path as Coords[]
+      const pathCoords = path as Coords[]
       if (pathCoords.length === 0) {
         queryClient.invalidateQueries(["tasks"], { exact: true })
         setCurrentPath([{ x: 1, y: 1 }])
