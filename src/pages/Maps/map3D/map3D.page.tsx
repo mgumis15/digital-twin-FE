@@ -10,8 +10,9 @@ import { ProductModal } from "../../../components/ProductModal.component"
 import { getProducts, getTasks } from "../../../func/databaseConnectors.axios"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Task } from "../../../interfaces/Task.interface"
+import { domain } from "../../../env/domain"
 
-const socket = io("http://localhost:3000")
+const socket = io(domain)
 
 export const Map3D = (): JSX.Element => {
   const [openModal, setOpenModal] = useState<boolean>(false)

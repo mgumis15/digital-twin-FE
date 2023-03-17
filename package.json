@@ -2,7 +2,7 @@
   "name": "digital-twin-frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy":"http://localhost:4000",
+  "proxy":"http://localhost:3000",
   "dependencies": {
     "@react-three/drei": "^9.56.17",
     "@react-three/fiber": "^8.10.4",
